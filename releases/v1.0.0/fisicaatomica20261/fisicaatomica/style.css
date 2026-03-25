@@ -1,0 +1,124 @@
+:root {
+    --bg-color: #0d1117;
+    --panel-bg: rgba(22, 27, 34, 0.7);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --text-color: #c9d1d9;
+    --title-color: #ffffff;
+    --primary: #2f81f7;
+    --primary-hover: #1f6feb;
+    --success: #238636;
+    --danger: #cf222e;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    background-image: radial-gradient(circle at top right, rgba(47, 129, 247, 0.1) 0%, transparent 40%),
+                      radial-gradient(circle at bottom left, rgba(35, 134, 54, 0.05) 0%, transparent 40%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Base Styles */
+h1, h2, h3 { color: var(--title-color); }
+
+.glass-panel {
+    background: var(--panel-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+
+/* Login */
+.login-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+.login-wrapper .glass-panel { max-width: 400px; width: 100%; text-align: center; }
+.icon-header { font-size: 3rem; margin-bottom: 10px; animation: float 3s ease-in-out infinite; }
+
+@keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+}
+
+.input-group { margin-bottom: 20px; text-align: left; }
+.input-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; }
+.input-group input {
+    width: 100%; padding: 12px; border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: rgba(0,0,0,0.2); color: white;
+    font-family: 'Inter', sans-serif; transition: 0.2s;
+}
+.input-group input:focus { outline: none; border-color: var(--primary); background: rgba(0,0,0,0.4); }
+
+.btn-primary {
+    width: 100%; padding: 12px; background: var(--primary);
+    color: white; border: none; border-radius: 6px;
+    font-weight: 600; cursor: pointer; transition: 0.2s;
+}
+.btn-primary:hover { background: var(--primary-hover); }
+
+.error-msg { color: #ff7b72; margin-top: 15px; font-size: 0.85rem; display: none; }
+
+/* Dashboard */
+.dashboard-wrapper { max-width: 900px; margin: 0 auto; padding: 40px 20px; width: 100%; }
+.header-hero { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;}
+.header-hero .student-info p { margin-top: 5px; color: #8b949e; }
+.header-hero .logout { color: #ff7b72; cursor: pointer; text-decoration: none; font-size: 0.9em; }
+
+.tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.task-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px; padding: 20px;
+    transition: transform 0.2s;
+}
+.task-card:hover { transform: translateY(-3px); }
+
+.task-card.completed { border-color: rgba(35, 134, 54, 0.4); background: rgba(35, 134, 54, 0.05); }
+
+.task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.task-header h3 { font-size: 1.1rem; }
+.badge { padding: 4px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+.badge.pending { background: rgba(207, 34, 46, 0.1); color: #ff7b72; border: 1px solid rgba(255, 123, 114, 0.2); }
+.badge.done { background: rgba(35, 134, 54, 0.2); color: #3fb950; border: 1px solid rgba(63, 185, 80, 0.2); }
+
+.upload-area { margin-top: 15px; }
+.upload-area input[type="file"] {
+    width: 100%; font-size: 0.8rem;
+    margin-bottom: 10px; color: #8b949e;
+}
+.upload-area input[type="file"]::file-selector-button {
+    background: rgba(255,255,255,0.1); border: 1px solid var(--border-color);
+    color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer;
+    margin-right: 10px; transition: 0.2s;
+}
+.upload-area input[type="file"]::file-selector-button:hover { background: rgba(255,255,255,0.2); }
+
+.btn-upload {
+    width: 100%; padding: 8px; background: rgba(255,255,255,0.1);
+    color: white; border: 1px solid var(--border-color); border-radius: 4px;
+    cursor: pointer; transition: 0.2s; font-size: 0.85rem; font-weight: 500;
+}
+.btn-upload:hover { background: var(--primary); border-color: var(--primary); }
+
+.completion-info { font-size: 0.85rem; color: #8b949e; display: flex; align-items: center; gap: 8px;}
+.completion-info a { color: var(--primary); text-decoration: none; }
+.completion-info a:hover { text-decoration: underline; }

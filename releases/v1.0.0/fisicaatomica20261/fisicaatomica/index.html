@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tareas - Física Atómica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-wrapper" style="gap: 2rem; flex-wrap: wrap; align-items: stretch;">
+        
+        <!-- Panel de Ayuda / Instrucciones -->
+        <div class="glass-panel" style="max-width: 400px; text-align: left; display: flex; flex-direction: column; justify-content: center;">
+            <h2 style="margin-bottom: 1.2rem; display: flex; align-items: center; gap: 10px; color: #58a6ff;">💡 Instrucciones Generales</h2>
+            <p style="margin-bottom: 1rem; line-height: 1.5; color: #8b949e;">Bienvenido a la plataforma de recepción de tareas del curso de <b>Física Atómica</b>. Para enviar tu trabajo, sigue estos pasos:</p>
+            <ul style="list-style-position: outside; margin-left: 1.2rem; color: #c9d1d9; line-height: 1.6; font-size: 0.95rem;">
+                <li style="margin-bottom: 0.5rem;">Escribe tu <b>correo electrónico</b> para identificarte.</li>
+                <li style="margin-bottom: 0.5rem;">Presiona <b>Enviar Código</b>; te llegará una clave de 6 dígitos segura a tu buzón (revisa SPAM).</li>
+                <li style="margin-bottom: 0.5rem;">Ingresa la clave para acceder a tu <b>Panel Personal de Tareas</b>.</li>
+                <li>Dentro del Panel podrás subir tus archivos (PDF o Word) a las casillas que correspondan a cada tarea asignada.</li>
+            </ul>
+        </div>
+
+        <div class="glass-panel" id="panel-email" style="flex: 1; max-width: 400px; display: flex; flex-direction: column; justify-content: center;">
+            <div class="icon-header">⚛️</div>
+            <h1>Física Atómica</h1>
+            <p class="subtitle">Verificación de Identidad</p>
+            
+            <form id="emailForm">
+                <div class="input-group">
+                    <label for="email">Tu Correo Electrónico</label>
+                    <input type="email" id="email" required placeholder="ejemplo@gmail.com" autocomplete="email">
+                </div>
+                <button type="submit" class="btn-primary" id="btn-email">Enviar Código al Correo</button>
+            </form>
+            <div id="error-email" class="error-msg"></div>
+        </div>
+
+        <div class="glass-panel" id="panel-code" style="display:none;">
+            <div class="icon-header">📬</div>
+            <h1>Ingresa el Código</h1>
+            <p class="subtitle">Te enviamos 6 dígitos a tu bandeja</p>
+            
+            <form id="codeForm">
+                <div class="input-group">
+                    <label for="code">Código Seguro</label>
+                    <input type="text" id="code" required placeholder="123456" autocomplete="off" maxlength="6" style="text-align:center; font-size:1.5rem; letter-spacing:4px;">
+                </div>
+                <button type="submit" class="btn-primary" id="btn-code">Verificar y Entrar</button>
+            </form>
+            <div id="error-code" class="error-msg"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Primer paso: Enviar correo
+        document.getElementById('emailForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const btn = document.getElementById('btn-email');
+            const err = document.getElementById('error-email');
+            
+            if(!email) return;
+            
+            btn.textContent = 'Enviando...';
+            btn.disabled = true;
+            err.style.display = 'none';
+            
+            const formData = new FormData();
+            formData.append('action', 'send_code');
+            formData.append('email', email);
+
+            try {
+                const res = await fetch('api.php', { method: 'POST', body: formData });
+                const data = await res.json();
+                
+                if(data.success) {
+                    document.getElementById('panel-email').style.display = 'none';
+                    document.getElementById('panel-code').style.display = 'block';
+                    if (data.debug_code) prompt('⚙️ MODO PRUEBA ALERTA DE COPIA\n\nTu código seguro es el siguiente (selecciona y copia):', data.debug_code);
+                } else {
+                    err.textContent = data.error;
+                    err.style.display = 'block';
+                    btn.textContent = 'Reintentar';
+                    btn.disabled = false;
+                }
+            } catch(error) {
+                err.textContent = 'Error de conexión. Contactando PHP.';
+                err.style.display = 'block';
+                btn.textContent = 'Reintentar';
+                btn.disabled = false;
+            }
+        });
+
+        // Segundo paso: Verificar clave 6 dígitos
+        document.getElementById('codeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const code = document.getElementById('code').value.trim();
+            const btn = document.getElementById('btn-code');
+            const err = document.getElementById('error-code');
+            
+            if(!code) return;
+            
+            btn.textContent = 'Verificando...';
+            btn.disabled = true;
+            err.style.display = 'none';
+            
+            const formData = new FormData();
+            formData.append('action', 'verify_code');
+            formData.append('code', code);
+
+            try {
+                const res = await fetch('api.php', { method: 'POST', body: formData });
+                const data = await res.json();
+                
+                if(data.success) {
+                    localStorage.setItem('alumno_codigo', data.alumno.codigo);
+                    localStorage.setItem('alumno_nombre', data.alumno.nombre);
+                    localStorage.setItem('alumno_fecha', data.alumno.fecha_inscripcion);
+                    window.location.href = 'dashboard.html';
+                } else {
+                    err.textContent = data.error;
+                    err.style.display = 'block';
+                    btn.textContent = 'Verificar y Entrar';
+                    btn.disabled = false;
+                }
+            } catch(error) {
+                err.textContent = 'Error de conexión durante validación.';
+                err.style.display = 'block';
+                btn.textContent = 'Verificar y Entrar';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

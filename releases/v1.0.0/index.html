@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coordinación | Maestría en Física PUCP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Barra Lateral Izquierda (Tono Oscuro) -->
+        <aside class="sidebar dark-sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🏛️</span>
+                    <h2>Coordinación</h2>
+                </div>
+                <p class="subtitle">Maestría en Física PUCP</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" onclick="loadContent('home.html', this)">
+                    <span class="icon">🏠</span>
+                    <div class="btn-text">
+                        <span class="title">Home</span>
+                        <span class="desc" style="white-space: normal; line-height: 1.2; margin-top: 4px;">Página de Coordinación de la Maestría en Física</span>
+                    </div>
+                </button>
+                
+                <button class="nav-btn" onclick="loadContent('fisicaatomica20261/maestria/web/index.html', this)">
+                    <span class="icon">📝</span>
+                    <div class="btn-text">
+                        <span class="title">Preinscripción</span>
+                        <span class="desc" style="white-space: normal; line-height: 1.2; margin-top: 4px;">Preinscripción de Cursos de la Maestría Física 2026-2</span>
+                    </div>
+                </button>
+                
+                <button class="nav-btn" onclick="loadContent('fisicaatomica20261/fisicaatomica/index.html', this)">
+                    <span class="icon">⚛️</span>
+                    <div class="btn-text">
+                        <span class="title">Física Atómica</span>
+                        <span class="desc" style="white-space: normal; line-height: 1.2; margin-top: 4px;">Tareas de Física Atómica</span>
+                    </div>
+                </button>
+                
+                <button class="nav-btn" onclick="loadContent('admin.html', this)">
+                    <span class="icon">⚙️</span>
+                    <div class="btn-text">
+                        <span class="title">Admin</span>
+                        <span class="desc" style="white-space: normal; line-height: 1.2; margin-top: 4px;">Gestión y Configuración</span>
+                    </div>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar">C</div>
+                    <span>Coordinador</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <main class="main-content">
+            <iframe id="content-frame" src="home.html" frameborder="0" title="Contenido Principal"></iframe>
+        </main>
+    </div>
+
+    <script>
+        function loadContent(url, btnElement) {
+            document.getElementById('content-frame').src = url;
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            btnElement.classList.add('active');
+        }
+    </script>
+</body>
+</html>

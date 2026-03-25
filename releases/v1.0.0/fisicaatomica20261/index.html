@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Académico</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; padding: 0; min-height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            background: radial-gradient(circle at 20% 30%, #111827 0%, #05070a 100%);
+            font-family: 'Inter', sans-serif;
+            color: #ffffff;
+            overflow: hidden;
+        }
+        
+        .glow-bg {
+            position: absolute;
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(47, 129, 247, 0.12) 0%, rgba(0,0,0,0) 65%);
+            z-index: 0; pointer-events: none;
+            animation: pulse 8s infinite alternate ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.9) translate(-30px, 20px); opacity: 0.6; }
+            100% { transform: scale(1.1) translate(20px, -20px); opacity: 1; }
+        }
+
+        h1 { 
+            position: relative; z-index: 1;
+            margin-bottom: 60px; font-weight: 300; 
+            letter-spacing: 6px; font-size: 2.2rem;
+            text-transform: uppercase;
+            text-shadow: 0 0 30px rgba(255,255,255,0.15);
+            color: #e6edf3;
+        }
+
+        .links-container { 
+            position: relative; z-index: 1;
+            display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; 
+            max-width: 900px; padding: 0 20px;
+        }
+
+        .link-card {
+            background: rgba(22, 27, 34, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 50px 40px; border-radius: 28px;
+            text-decoration: none; color: white;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+            display: flex; flex-direction: column; align-items: center; gap: 25px;
+            width: 340px;
+            text-align: center;
+        }
+
+        .link-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            background: rgba(47, 129, 247, 0.08);
+            border-color: rgba(47, 129, 247, 0.3);
+            box-shadow: 0 30px 50px rgba(0,0,0,0.6), 0 0 40px rgba(47, 129, 247, 0.15);
+        }
+
+        .icon { font-size: 4rem; filter: drop-shadow(0 8px 12px rgba(0,0,0,0.4)); transition: transform 0.3s; }
+        .link-card:hover .icon { transform: scale(1.1); }
+        
+        .title { 
+            font-size: 1.25rem; font-weight: 500; line-height: 1.5; 
+            color: #c9d1d9; transition: color 0.3s; 
+        }
+        .link-card:hover .title { color: #ffffff; }
+
+        @media (max-width: 768px) {
+            .links-container { flex-direction: column; gap: 25px; }
+            h1 { font-size: 1.6rem; letter-spacing: 3px; margin-bottom: 40px;}
+            .link-card { width: 100%; max-width: 320px; padding: 40px 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="glow-bg"></div>
+    <h1>Portal Académico</h1>
+    <div class="links-container">
+        <a href="maestria/web/index.html" class="link-card">
+            <span class="icon">🎓</span> 
+            <span class="title">Preinscripción de cursos de la maestría en física 2026-2</span>
+        </a>
+        <a href="fisicaatomica/index.html" class="link-card">
+            <span class="icon">⚛️</span> 
+            <span class="title">Tareas de física atómica</span>
+        </a>
+    </div>
+</body>
+</html>

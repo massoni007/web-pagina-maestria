@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Alumno - Física Atómica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <div class="header-hero">
+            <div class="student-info">
+                <h1>Hola, <span id="lbl-nombre">Alumno</span></h1>
+                <p>Código: <b id="lbl-codigo"></b> &bull; Inscrito desde: <b id="lbl-fecha"></b></p>
+            </div>
+            <a href="#" class="logout" id="btnLogout">Cerrar Sesión</a>
+        </div>
+        
+        <div class="glass-panel" style="margin-bottom: 30px; text-align: left; padding: 20px; border-left: 4px solid #58a6ff;">
+            <h3 style="margin-bottom: 10px; color: #58a6ff; display: flex; align-items: center; gap: 8px;">ℹ️ Cómo subir tus tareas al sistema</h3>
+            <p style="font-size: 0.95rem; line-height: 1.6; color: #c9d1d9;">Para entregar una asignación, haz clic en el botón <b>"Elegir archivo"</b> debajo del número de tarea correspondiente (formato OBLIGATORIO: PDF). Luego presiona el botón azul <b>"Subir PDF"</b>.<br><br>Espera unos segundos a que el sistema procese tu documento. Cuando termine exitosamente, el recuadro se tornará verde oscuro, dirá "Entregada" e incluirá la constancia de subida con tu fecha y enlace de descarga originenal. <i>¡Solo se permite una subida por tarea, revisa bien tu archivo antes de enviarlo!</i></p>
+        </div>
+
+        <div class="tasks-grid" id="tasksContainer">
+            <!-- Tareas generadas por JS -->
+        </div>
+    </div>
+
+    <script>
+        // Check session
+        const cod = localStorage.getItem('alumno_codigo');
+        if(!cod) window.location.href = 'index.html';
+        
+        document.getElementById('lbl-nombre').textContent = localStorage.getItem('alumno_nombre');
+        document.getElementById('lbl-codigo').textContent = cod;
+        document.getElementById('lbl-fecha').textContent = localStorage.getItem('alumno_fecha');
+
+        document.getElementById('btnLogout').addEventListener('click', () => {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        });
+
+        // Load Tasks
+        async function loadTasks() {
+            const container = document.getElementById('tasksContainer');
+            container.innerHTML = '<p>Cargando tareas...</p>';
+            
+            try {
+                const res = await fetch(`api.php?action=get_tasks&codigo=${cod}`);
+                const data = await res.json();
+                
+                if(data.success) {
+                    renderTasks(data);
+                } else {
+                    container.innerHTML = `<div class="error-msg" style="display:block">Error: ${data.error}</div>`;
+                }
+            } catch(e) {
+                container.innerHTML = '<div class="error-msg" style="display:block">No se pudo contactar al servidor PHP.</div>';
+            }
+        }
+
+        function renderTasks(data) {
+            const entregadas = data.entregadas || {};
+            const defs = data.definicion_tareas || [];
+            
+            const container = document.getElementById('tasksContainer');
+            container.innerHTML = '';
+            
+            if (defs.length === 0) {
+                container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: #8b949e; padding: 2rem; background: rgba(30, 41, 59, 0.4); border-radius: 8px; border: 1px dashed #334155;">No hay tareas activas configuradas por el profesor en este momento.</div>';
+                return;
+            }
+            
+            // Generar tarjetas basadas en definiciones dinámicas
+            defs.forEach(t => {
+                const i = t.id;
+                const isDone = entregadas[i] !== undefined;
+                
+                const card = document.createElement('div');
+                card.className = `task-card ${isDone ? 'completed' : ''}`;
+                
+                let contentHTML = `
+                    <div class="task-header" style="flex-wrap: nowrap;">
+                        <div style="flex:1;">
+                            <h3 style="margin-bottom:6px; color:#58a6ff; font-size:1.15rem;">${t.titulo}</h3>
+                            <p style="font-size:0.85rem; color:#8b949e; font-weight:normal; line-height:1.5; white-space:pre-wrap; margin-right:10px;">${t.descripcion || ''}</p>
+                            ${t.archivo ? `<a href="../../${t.archivo}" target="_blank" style="display:inline-block; margin-top:8px; font-size:0.85rem; font-weight:600; color:#58a6ff; text-decoration:none; padding:4px 0; border-bottom:1px solid #58a6ff; transition: opacity 0.2s;" onmouseover="this.style.opacity=0.7" onmouseout="this.style.opacity=1">📄 Ver PDF de la Tarea</a>` : ''}
+                        </div>
+                        <span class="badge ${isDone ? 'done' : 'pending'}" style="align-self: flex-start; margin-top:2px; flex-shrink:0;">${isDone ? 'Entregada' : 'Pendiente'}</span>
+                    </div>
+                `;
+                
+                if(isDone) {
+                    contentHTML += `
+                        <div class="completion-info" style="margin-top:15px;">
+                            <span>✅ Subido el: ${entregadas[i].fecha_entrega}</span>
+                        </div>
+                        <div class="completion-info" style="margin-top:5px">
+                            <span><a href="uploads/${entregadas[i].archivo}" target="_blank" download style="color:#58a6ff; text-decoration:none; font-weight:600;">⬇️ Descargar mi archivo</a></span>
+                        </div>
+                    `;
+                } else {
+                    contentHTML += `
+                        <form class="upload-area" onsubmit="uploadTask(event, ${i})" style="margin-top:15px;">
+                            <input type="file" required id="file_${i}" accept=".pdf" style="width:100%; border-radius:4px; padding:8px; border:1px solid #30363d; background:#0d1117; color:#c9d1d9;">
+                            <button type="submit" class="btn-upload" id="btn_${i}" style="margin-top:10px;">Subir PDF</button>
+                            <div class="error-msg" id="err_${i}"></div>
+                        </form>
+                    `;
+                }
+                
+                card.innerHTML = contentHTML;
+                container.appendChild(card);
+            });
+        }
+
+        async function uploadTask(e, taskNum) {
+            e.preventDefault();
+            const fileInput = document.getElementById(`file_${taskNum}`);
+            const btn = document.getElementById(`btn_${taskNum}`);
+            const err = document.getElementById(`err_${taskNum}`);
+            
+            const file = fileInput.files[0];
+            if(!file) return;
+            
+            btn.textContent = 'Subiendo...';
+            btn.disabled = true;
+            err.style.display = 'none';
+            
+            const formData = new FormData();
+            formData.append('action', 'upload_task');
+            formData.append('codigo', cod);
+            formData.append('tarea_num', taskNum);
+            formData.append('archivo', file);
+            
+            try {
+                const res = await fetch('api.php', { method: 'POST', body: formData });
+                const data = await res.json();
+                
+                if(data.success) {
+                    // Recargar toda la interfaz para actualizar
+                    loadTasks();
+                } else {
+                    err.textContent = data.error;
+                    err.style.display = 'block';
+                    btn.textContent = 'Reintentar Subida';
+                    btn.disabled = false;
+                }
+            } catch(error) {
+                err.textContent = 'Error de conexión. Revisa que el servidor PHP esté localmente encendido.';
+                err.style.display = 'block';
+                btn.textContent = 'Reintentar Subida';
+                btn.disabled = false;
+            }
+        }
+
+        // Initialize
+        loadTasks();
+    </script>
+</body>
+</html>

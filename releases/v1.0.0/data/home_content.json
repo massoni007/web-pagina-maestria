@@ -1,0 +1,30 @@
+{
+    "anuncios": [
+        {
+            "id": "ann_69c0454be412d",
+            "titulo": "IMPORTANTE",
+            "texto": "<ul><li>Los cursos que en el plan antiguo eran obligatorios y que en el plan nuevo figuran como electivos podrán ser llevados por los estudiantes del plan antiguo para completar su plan de estudios. En esos casos, dichos cursos se reconocerán como obligatorios del plan antiguo.<\/li><\/ul><p><br><\/p><ul><li>Para matricularse en Seminario de Tesis del plan antiguo, o en Seminario de Tesis 1 y Seminario de Tesis 2 del plan nuevo, deben enviar un correo con la autorización de su asesor.\nEl correo para ese trámite, y para cualquier consulta sobre equivalencias, matrícula o reconocimiento de cursos, es:\nAshley Llasaca Delgadillo\nashley.llasaca@pucp.edu.pe<\/li><\/ul><p><br><\/p><ul><li>Se recomienda revisar los archivos disponibles en la página, en particular “Charla Informativa a los estudiantes” y “Nuevo Plan de estudios (2026 1 …)”, donde se encuentra información importante sobre el plan de estudios, directrices, calendarios y formatos oficiales de la maestría.<\/li><\/ul>",
+            "fecha": "2026-03-22 19:47:49"
+        }
+    ],
+    "documentos": [
+        {
+            "id": "doc_69c0402b4116e",
+            "titulo": "Charla Informativa a los estudiantes",
+            "archivo_real": "Cambio de Plan de Estudios (1).pptx",
+            "ruta": "data\/uploads\/home\/260322191659_b52ccb.pptx",
+            "tipo": "Documento Genérico",
+            "size": "464.2 KB",
+            "fecha": "2026-03-22 19:16:59"
+        },
+        {
+            "id": "doc_69c03ffcc4b60",
+            "titulo": "Nuevo Plan de estudios (2026 1 ...)",
+            "archivo_real": "plan_nuevo.xlsx",
+            "ruta": "data\/uploads\/home\/260322191612_a45525.xlsx",
+            "tipo": "Hoja de Cálculo",
+            "size": "9.3 KB",
+            "fecha": "2026-03-22 19:16:12"
+        }
+    ]
+}

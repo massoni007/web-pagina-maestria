@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selector de Proyectos</title>
+    <style>
+        body {
+            margin: 0; padding: 0; height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            background: linear-gradient(135deg, #0d1117, #161b22);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+        }
+        h1 { margin-bottom: 40px; font-weight: 300; letter-spacing: 2px; }
+        .links-container { display: flex; gap: 30px; }
+        .link-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px 50px; border-radius: 16px;
+            text-decoration: none; color: white;
+            font-size: 1.2rem; font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; align-items: center; gap: 15px;
+        }
+        .link-card:hover {
+            transform: translateY(-10px);
+            background: rgba(47, 129, 247, 0.15);
+            border-color: #2f81f7;
+        }
+        .icon { font-size: 3rem; }
+    </style>
+</head>
+<body>
+    <h1>SISTEMAS ACADÉMICOS</h1>
+    <div class="links-container">
+        <a href="maestria/web/index.html" class="link-card">
+            <span class="icon">🎓</span> 
+            <span>Sistema de Maestría</span>
+        </a>
+        <a href="fisicaatomica/index.html" class="link-card">
+            <span class="icon">⚛️</span> 
+            <span>Tareas - Física Atómica</span>
+        </a>
+    </div>
+</body>
+</html>

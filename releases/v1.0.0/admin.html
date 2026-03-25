@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - PUCP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; padding: 2rem; }
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        .card {
+            background: white; border-radius: 12px; padding: 2.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;
+            text-align: center; max-width: 500px; margin: 4rem auto;
+        }
+        
+        .card h2 { color: #0f172a; margin-bottom: 1rem; font-size: 1.8rem; }
+        .card p { color: #64748b; margin-bottom: 2rem; line-height: 1.5; }
+        
+        .btn {
+            padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer;
+            border: none; transition: all 0.2s; font-size: 1rem; width: 100%;
+        }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary:hover:not(:disabled) { background: #2563eb; }
+        .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: #ef4444; color: white; width: auto; }
+        
+        input[type="text"] {
+            width: 100%; padding: 1rem; font-size: 1.5rem; text-align: center; letter-spacing: 5px;
+            border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;
+            outline: none; transition: border-color 0.2s;
+        }
+        input[type="text"]:focus { border-color: #3b82f6; }
+        
+        .message { margin-top: 1.5rem; font-weight: 500; font-size: 0.95rem; }
+        
+        /* Dashboard Styles */
+        .dashboard-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #e2e8f0; padding-bottom: 1.5rem; margin-bottom: 2rem;
+        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .dash-card {
+            background: white; padding: 1.5rem; border-radius: 12px;
+            border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: left;
+        }
+        .dash-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: #1e293b; }
+        .dash-card p { color: #64748b; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SECCIÓN DE LOGIN -->
+        <div id="login-section" class="card">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🔐</div>
+            <h2>Acceso Restringido</h2>
+            <p>Se enviará un código de verificación de seguridad de 6 dígitos al correo registrado:<br><strong style="color: #1e293b;">massoni0607@gmail.com</strong></p>
+            
+            <button id="send-code-btn" onclick="sendCode()" class="btn btn-primary">Enviar Código por Email</button>
+            
+            <div id="code-input-area" style="display: none; margin-top: 2rem; text-align: left;">
+                <label style="color: #475569; font-weight: 500; font-size: 0.9rem;">Ingrese el código de 6 dígitos:</label>
+                <input type="text" id="verification-code" maxlength="6" placeholder="000000">
+                <button onclick="verifyCode()" class="btn btn-success" style="margin-top: 1rem;">Verificar y Entrar</button>
+            </div>
+            
+            <div id="status-msg" class="message"></div>
+        </div>
+        
+        <!-- SECCIÓN DEL DASHBOARD (Oculta al inicio) -->
+        <div id="dashboard-section" style="display: none;">
+            <div class="dashboard-header">
+                <div>
+                    <h2 style="font-size: 1.8rem; color: #0f172a;">🛠️ Panel de Gestión Global</h2>
+                    <p style="color: #64748b; margin-top: 0.5rem;">Administrador: Eduardo Massoni</p>
+                </div>
+                <button onclick="logout()" class="btn btn-danger">Cerrar Sesión</button>
+            </div>
+            
+            <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px 20px; border-radius: 8px; margin-bottom: 2rem;">
+                <h3 style="color: #1d4ed8; margin-bottom: 8px; font-size: 1.1rem; display: flex; align-items: center; gap: 6px;">💡 Guía del Panel de Control</h3>
+                <p style="color: #334155; font-size: 0.95rem; line-height: 1.5;">Desde este panel administras el motor del portal. Utiliza <b>"Ver Estudiantes y Tareas"</b> para evaluar los envíos del curso de Física Atómica. Usa <b>"Editar Catálogo de Cursos"</b> para modificar al instante qué cursos ven los alumnos al momento de su Preinscripción en el 2026-II.</p>
+            </div>
+
+            <div class="grid">
+                <div class="dash-card">
+                    <h3>📄 Gestión de Documentos</h3>
+                    <p>Sube, edita o elimina documentos de la página de inicio (Formatos, Reglas, Cronogramas).</p>
+                    <button class="btn btn-primary" style="padding: 0.6rem;" onclick="openHomeEditor()">Administrar Docs</button>
+                </div>
+                <div class="dash-card">
+                    <h3>👥 Alumnos Física Atómica</h3>
+                    <p>Revisa las tareas enviadas, visualiza las calificaciones y el estado de los estudiantes.</p>
+                    <button class="btn btn-primary" style="padding: 0.6rem; margin-bottom: 0.5rem;" onclick="openAlumnosViewer()">Ver Estudiantes y Tareas</button>
+                    <button class="btn btn-secondary" style="padding: 0.6rem; background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; width: 100%;" onclick="openFaTasksEditor()">📋 Gestor de Asignaciones</button>
+                </div>
+                <div class="dash-card">
+                    <h3>📝 Preinscripciones 2026-2</h3>
+                    <p>Accede a la base de datos de alumnos preinscritos y edita el catálogo de cursos ofrecidos.</p>
+                    <button class="btn btn-primary" style="padding: 0.6rem;" onclick="window.location.href='fisicaatomica20261/maestria/web/data/inscripciones.csv'">Descargar CSV de Alumnos</button>
+                    <button class="btn btn-secondary" style="padding: 0.6rem; margin-top: 10px; background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; width: 100%;" onclick="openCursosEditor()">✎ Editar Catálogo de Cursos</button>
+                </div>
+            </div>
+            
+            <!-- Editor del Home CMS -->
+            <div id="home-editor" style="display: none; margin-top: 3rem; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
+                <h3 style="margin-bottom: 0.5rem; color: #0f172a; font-size: 1.5rem;">📄 Gestión de Contenidos del Portal Principal</h3>
+                <p style="margin-bottom: 1.5rem; color: #64748b;">Añade nuevos anuncios de coordinación o sube documentos PDF/Excel. Las publicaciones impactan a los alumnos inmediatamente sin requerir edición de servidor.</p>
+                
+                <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                    
+                    <!-- Panel de Anuncios -->
+                    <div style="flex: 1; min-width: 300px; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <h4 style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; color: #0f172a;">📢 Redactar Anuncios <span id="ann-contador" style="background:#3b82f6;color:white;padding:2px 8px;border-radius:12px;font-size:0.8rem;">0</span></h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid #cbd5e1; margin-bottom: 1.5rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                            <input type="text" id="ann-titulo" placeholder="Ej. Inicio de Coordinación 2026" style="width: 100%; border: 1px solid #e2e8f0; border-radius: 4px; padding: 0.6rem; font-size: 0.95rem; margin-bottom: 0.5rem; font-weight: bold; letter-spacing: 0; text-align: left;">
+                            <input type="hidden" id="ann-edit-id" value="">
+                            <div id="ann-editor-container" style="height: 140px; background: white; margin-bottom: 1rem;"></div>
+                            <div style="display: flex; gap: 10px;">
+                                <button id="btn-pub-ann" onclick="publicarAnuncio()" style="flex: 1; background: #10b981; color: white; border: none; padding: 0.6rem; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s;">Publicar Nuevo Anuncio</button>
+                                <button id="btn-cancel-edit" onclick="cancelarEdicionAnn()" style="display: none; background: #ef4444; color: white; border: none; padding: 0.6rem; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s;">Cancelar Edición</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Listado de anuncios subidos -->
+                        <div id="lista-anuncios-admin" style="max-height: 250px; overflow-y: auto; padding-right: 5px;"></div>
+                    </div>
+                    
+                    <!-- Panel de Documentos -->
+                    <div style="flex: 1; min-width: 300px; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <h4 style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; color: #0f172a;">📁 Archivos Institucionales <span id="doc-contador" style="background:#f59e0b;color:white;padding:2px 8px;border-radius:12px;font-size:0.8rem;">0</span></h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid #cbd5e1; margin-bottom: 1.5rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                            <input type="text" id="doc-titulo" placeholder="Máscara del Título (Ej. Plan de Estudios 2026)" title="Este será el texto con el cual los alumnos verán e identificarán el archivo adjunto" style="width: 100%; border: 1px solid #e2e8f0; border-radius: 4px; padding: 0.6rem; font-size: 0.95rem; margin-bottom: 0.5rem; font-weight: bold; letter-spacing: 0; text-align: left;">
+                            <input type="file" id="doc-archivo" title="Procura subir formatos en PDF, Word (.docx) o Excels (.xlsx)" style="width: 100%; border: 1.5px dashed #cbd5e1; border-radius: 4px; padding: 0.8rem; margin-bottom: 0.5rem; font-size: 0.85rem; color: #64748b; background: #fefce8; cursor: pointer;">
+                            <button id="btn-pub-doc" onclick="subirDocumento()" style="width: 100%; background: #f59e0b; color: white; border: none; padding: 0.6rem; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s;">Subir y Habilitar Descarga</button>
+                            <div id="doc-err" style="color: #ef4444; font-size: 0.85rem; font-weight: 500; margin-top: 0.5rem; display: none;"></div>
+                        </div>
+                        
+                        <!-- Listado de documentos en base de datos -->
+                        <ul id="lista-documentos-admin" style="list-style: none; padding: 0; margin: 0; max-height: 250px; overflow-y: auto; padding-right: 5px;"></ul>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: right; border-top: 2px solid #e2e8f0; padding-top: 1.5rem;">
+                    <button class="btn btn-danger" style="background: #ef4444; width: auto; padding: 0.8rem 2rem;" onclick="document.getElementById('home-editor').style.display='none'">Ocultar Editor</button>
+                </div>
+            </div>
+
+            </div>
+
+            <!-- Gestor de Asignaciones FA -->
+            <div id="fa-tasks-editor" style="display: none; margin-top: 3rem; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                    <div>
+                        <h3 style="margin-bottom: 0.5rem; color: #0f172a; font-size: 1.5rem;">📋 Gestor de Asignaciones (F. Atómica)</h3>
+                        <p style="color: #64748b;">Habilita nuevas tareas para que los alumnos las vean en su portal privado. Todas las entregas están forzadas obligatoriamente a archivos PDF.</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                    <!-- Formulario de creación -->
+                    <div style="flex: 1; min-width: 300px; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <h4 style="margin-bottom: 1rem; color: #0f172a;">Configurar Nueva Tarea</h4>
+                        <input type="hidden" id="fa-task-edit-id" value="">
+                        <input type="text" id="fa-task-titulo" placeholder="Ej. Tarea 1 o Proyecto Final" style="width: 100%; border: 1px solid #e2e8f0; border-radius: 4px; padding: 0.6rem; font-size: 0.95rem; margin-bottom: 0.8rem; font-weight: bold;">
+                        <textarea id="fa-task-desc" placeholder="Instrucciones para el alumno (opcional)..." rows="4" style="width: 100%; border: 1px solid #e2e8f0; border-radius: 4px; padding: 0.6rem; font-size: 0.9rem; font-family: inherit; resize: vertical; margin-bottom: 0.4rem;"></textarea>
+                        
+                        <label style="display:block; font-size:0.8rem; font-weight:600; color:#475569; margin-bottom:4px;">📥 Adjuntar Enunciado (Opcional, solo PDF):</label>
+                        <input type="file" id="fa-task-archivo" accept=".pdf" style="width: 100%; border: 1.5px dashed #cbd5e1; border-radius: 4px; padding: 0.6rem; font-size: 0.85rem; color: #64748b; background: white; cursor: pointer; margin-bottom: 1rem;">
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <button id="btn-pub-fa-task" onclick="guardarFaTask()" style="flex: 1; background: #8b5cf6; color: white; border: none; padding: 0.6rem; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s;">Habilitar Asignación</button>
+                            <button id="btn-cancel-fa-task" onclick="cancelarEdicionFaTask()" style="display: none; background: #ef4444; color: white; border: none; padding: 0.6rem; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s;">Cancelar</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Lista de tareas activas -->
+                    <div style="flex: 1; min-width: 300px; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <h4 style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; color: #0f172a;">Asignaciones Activas <span id="fa-tasks-count" style="background:#8b5cf6;color:white;padding:2px 8px;border-radius:12px;font-size:0.8rem;">0</span></h4>
+                        <div id="lista-fa-tasks" style="max-height: 250px; overflow-y: auto; padding-right: 5px;"></div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: right; border-top: 2px solid #e2e8f0; padding-top: 1.5rem;">
+                    <button class="btn btn-danger" style="background: #ef4444; width: auto; padding: 0.8rem 2rem;" onclick="document.getElementById('fa-tasks-editor').style.display='none'">Ocultar Gestor</button>
+                </div>
+            </div>
+
+            <!-- Editor de Cursos (Estilo Excel) -->
+            <div id="cursos-editor" style="display: none; margin-top: 3rem; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
+                <h3 style="margin-bottom: 0.5rem; color: #0f172a; font-size: 1.5rem;">⚙️ Gestor Dinámico de Cursos</h3>
+                <p style="margin-bottom: 1.5rem; color: #64748b;">Modifica nombres o créditos y elimina celdas. Puedes "Agregar Nueva Fila" abajo. Al "Guardar", los alumnos verán los cambios en tiempo real en la vista de inscripción oficial.</p>
+                
+                <div style="border: 1px solid #e2e8f0; border-radius: 8px; max-height: 450px; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
+                        <thead style="background: #f8fafc; position: sticky; top: 0; border-bottom: 2px solid #e2e8f0;">
+                            <tr>
+                                <th style="padding: 12px; border-bottom: 1px solid #e2e8f0;">Categoría</th>
+                                <th style="padding: 12px; border-bottom: 1px solid #e2e8f0;">ID / Código</th>
+                                <th style="padding: 12px; border-bottom: 1px solid #e2e8f0;">Nombre del Curso</th>
+                                <th style="padding: 12px; width: 100px; border-bottom: 1px solid #e2e8f0;">Créditos</th>
+                                <th style="padding: 12px; text-align: center; border-bottom: 1px solid #e2e8f0;">🗑️</th>
+                            </tr>
+                        </thead>
+                        <tbody id="courses-tbody">
+                            <!-- Inyectado por JS -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                    <button class="btn" style="background:#f1f5f9; color:#475569; border:1px dashed #cbd5e1; width: auto;" onclick="addCourseRow()">➕ Añadir Fila</button>
+                    <div style="flex: 1;"></div>
+                    <button class="btn btn-danger" style="background: #ef4444;" onclick="document.getElementById('cursos-editor').style.display='none'">Cerrar sin guardar</button>
+                    <button class="btn btn-success" style="width: auto; padding: 0.8rem 2rem;" onclick="saveCursos(this)">💾 Guardar Cambios Globales</button>
+                </div>
+            </div>
+            
+            <!-- Visor de Alumnos y Tareas (Física Atómica) -->
+            <div id="alumnos-viewer" style="display: none; margin-top: 3rem; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
+                <h3 style="margin-bottom: 0.5rem; color: #0f172a; font-size: 1.5rem;">👨‍🎓 Estudiantes de Física Atómica</h3>
+                <p style="margin-bottom: 1.5rem; color: #64748b;">Selecciona un estudiante para ver el historial consolidado de las tareas que ha subido al servidor seguro.</p>
+                
+                <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+                    <!-- Lista de alumnos -->
+                    <div style="flex: 1; min-width: 250px; border: 1px solid #e2e8f0; border-radius: 8px; max-height: 450px; overflow-y: auto;">
+                        <ul id="lista-alumnos" style="list-style: none; margin: 0; padding: 0;">
+                            <!-- Inyectado por JS -->
+                        </ul>
+                    </div>
+                    
+                    <!-- Detalle de entregas -->
+                    <div style="flex: 2; min-width: 300px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem;">
+                        <div id="detalle-alumno-placeholder" style="color: #64748b; text-align: center; margin-top: 4rem;">
+                            👈 Selecciona un alumno de la lista para gestionar sus tareas.
+                        </div>
+                        <div id="detalle-alumno-content" style="display: none;">
+                            <h4 id="det-nombre" style="font-size: 1.3rem; color: #0f172a; margin-bottom: 0.25rem;"></h4>
+                            <p id="det-codigo" style="color: #3b82f6; font-weight: 600; margin-bottom: 1.5rem;"></p>
+                            
+                            <div style="background: white; padding: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                                <span>Total de tareas finalizadas en sistema:</span> 
+                                <span id="det-total" style="background: #10b981; color: white; padding: 4px 12px; border-radius: 50px; font-weight: 600;">0</span>
+                            </div>
+                            
+                            <h5 style="color: #334155; margin-bottom: 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;">Historial de Entregas</h5>
+                            <ul id="det-lista-tareas" style="list-style: none; padding: 0; max-height: 250px; overflow-y: auto; padding-right: 5px;">
+                                <!-- Tareas insertadas aquí -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: right;">
+                    <button class="btn btn-danger" style="background: #ef4444; width: auto; padding: 0.8rem 2rem;" onclick="document.getElementById('alumnos-viewer').style.display='none'">Cerrar Visor</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await fetch('admin_api.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'check_session' }) });
+                const result = await res.json();
+                if (result.success && result.logged_in) {
+                    document.getElementById('login-section').style.display = 'none';
+                    document.getElementById('dashboard-section').style.display = 'block';
+                }
+            } catch(e) { console.error("Session check failed", e); }
+        });
+
+        async function sendCode() {
+            // Verificar si el usuario está abriendo el archivo sin servidor web
+            if (window.location.protocol === 'file:') {
+                alert("⚠️ ATENCIÓN: Estás abriendo el portal directamente como archivo (file://). Para que el correo y la seguridad PHP funcionen, debes usar el servidor local. Por favor, ejecuta el archivo 'start_portal.bat' en tu carpeta.");
+                return;
+            }
+
+            const btn = document.getElementById('send-code-btn');
+            btn.innerText = "Procesando envío...";
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch('admin_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'send_code' })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('status-msg').innerHTML = "<span style='color: #10b981;'>✅ ¡Código enviado con éxito a <strong>massoni007@gmail.com</strong>!<br><br><small style='color:#64748b;'><em>(Nota: Si no recibes el correo en unos minutos porque tu entorno de Windows no tiene servidor SMTP activo, el sistema ha guardado un archivo de respaldo llamado <strong>codigo_admin_recibido.txt</strong> en la carpeta principal para que puedas probar el acceso de todas formas).</em></small></span>";
+                    document.getElementById('code-input-area').style.display = 'block';
+                    btn.innerText = "Código Generado ✔️";
+                    if(result.debug_code) prompt('⚙️ MODO PRUEBA ALERTA DE COPIA\n\nTu código seguro es el siguiente (selecciona y copia):', result.debug_code);
+                } else {
+                    document.getElementById('status-msg').innerHTML = "<span style='color: #ef4444;'>❌ Error al generar código.</span>";
+                    btn.disabled = false;
+                    btn.innerText = "Reintentar";
+                }
+            } catch (error) {
+                document.getElementById('status-msg').innerHTML = "<span style='color: #ef4444;'>❌ Error de red. No se pudo conectar con PHP.</span>";
+                btn.disabled = false;
+                btn.innerText = "Enviar Código por Email";
+            }
+        }
+        
+        async function verifyCode() {
+            const code = document.getElementById('verification-code').value;
+            if(code.length !== 6) {
+                document.getElementById('status-msg').innerHTML = "<span style='color: #ef4444;'>❌ Por favor ingrese un código de 6 dígitos completo.</span>";
+                return;
+            }
+
+            const btn = document.querySelector('.btn-success');
+            btn.innerText = "Verificando...";
+            
+            try {
+                const response = await fetch('admin_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'verify_code', code: code })
+                });
+                const result = await response.json();
+                
+                btn.innerText = "Verificar y Entrar";
+
+                if (result.success) { 
+                    document.getElementById('login-section').style.display = 'none';
+                    document.getElementById('dashboard-section').style.display = 'block';
+                } else {
+                    document.getElementById('status-msg').innerHTML = `<span style='color: #ef4444;'>❌ ${result.message}</span>`;
+                }
+            } catch (error) {
+                btn.innerText = "Verificar y Entrar";
+                document.getElementById('status-msg').innerHTML = "<span style='color: #ef4444;'>❌ Error de conexión al validar.</span>";
+            }
+        }
+        
+        async function logout() {
+            try {
+                await fetch('admin_api.php', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ action: 'logout' }) });
+            } catch(e) {}
+            
+            document.getElementById('dashboard-section').style.display = 'none';
+            document.getElementById('cursos-editor').style.display = 'none';
+            document.getElementById('alumnos-viewer').style.display = 'none';
+            document.getElementById('home-editor').style.display = 'none';
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('verification-code').value = '';
+            document.getElementById('status-msg').innerHTML = '';
+            document.getElementById('code-input-area').style.display = 'none';
+            
+            const btn = document.getElementById('send-code-btn');
+            btn.innerText = "Enviar Código por Email";
+            btn.disabled = false;
+        }
+
+        async function openCursosEditor() {
+            document.getElementById('home-editor').style.display = 'none';
+            document.getElementById('alumnos-viewer').style.display = 'none';
+            document.getElementById('fa-tasks-editor').style.display = 'none';
+            document.getElementById('cursos-editor').style.display = 'block';
+            document.getElementById('cursos-editor').scrollIntoView({behavior: 'smooth', block: 'end'});
+            
+            const tbody = document.getElementById('courses-tbody');
+            tbody.innerHTML = "<tr><td colspan='5' style='padding: 2rem; text-align:center;'>Cargando base de datos de cursos...</td></tr>";
+            
+            try {
+                const response = await fetch('admin_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get_cursos' })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    renderCursosTable(result.data);
+                } else {
+                    alert("Error obteniendo cursos: " + result.message);
+                    tbody.innerHTML = "";
+                }
+            } catch (err) {
+                alert("Error crítico de red cargando los cursos JSON.");
+                tbody.innerHTML = "";
+            }
+        }
+        
+        function renderCursosTable(data) {
+            const tbody = document.getElementById('courses-tbody');
+            let html = "";
+            for (const [cat, cursos] of Object.entries(data)) {
+                cursos.forEach(c => {
+                    const selObl = cat === 'Cursos Obligatorios' ? 'selected' : '';
+                    const selElec = cat === 'Cursos Electivos' ? 'selected' : '';
+                    html += `
+                    <tr style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding:0">
+                            <select class="inp-cat" style="width:100%; border:none; padding:12px; background:transparent; outline:none;">
+                                <option ${selObl}>Cursos Obligatorios</option>
+                                <option ${selElec}>Cursos Electivos</option>
+                            </select>
+                        </td>
+                        <td style="padding:0"><input class="inp-id" type="text" value="${c.id}" style="width:100%; border:none; padding:12px; background:transparent; font-size:1rem; letter-spacing:0; text-align:left; outline:none;"></td>
+                        <td style="padding:0"><input class="inp-nom" type="text" value="${c.nombre}" style="width:100%; border:none; padding:12px; background:transparent; font-size:1rem; letter-spacing:0; text-align:left; outline:none;"></td>
+                        <td style="padding:0"><input class="inp-cred" type="number" value="${c.creditos}" style="width:100%; border:none; padding:12px; background:transparent; font-size:1rem; letter-spacing:0; text-align:left; outline:none;"></td>
+                        <td style="padding:0; text-align:center;"><button title="Eliminar fila" tabindex="-1" onclick="this.closest('tr').remove()" style="background:transparent; border:none; color:#ef4444; font-size:1.2rem; cursor:pointer;">✖</button></td>
+                    </tr>`;
+                });
+            }
+            tbody.innerHTML = html;
+        }
+        
+        function addCourseRow() {
+            const tbody = document.getElementById('courses-tbody');
+            tbody.insertAdjacentHTML('beforeend', `
+            <tr style="border-bottom: 1px solid #f1f5f9; background: #fefce8;">
+                <td style="padding:0">
+                    <select class="inp-cat" style="width:100%; border:none; padding:12px; background:transparent; outline:none;">
+                        <option>Cursos Obligatorios</option>
+                        <option>Cursos Electivos</option>
+                    </select>
+                </td>
+                <td style="padding:0"><input class="inp-id" type="text" placeholder="NUEVO_COD" style="width:100%; border:none; padding:12px; background:transparent; outline:none; border-bottom: 1px solid #3b82f6; font-size:1rem; letter-spacing:0; text-align:left;"></td>
+                <td style="padding:0"><input class="inp-nom" type="text" placeholder="Nombre completo" style="width:100%; border:none; padding:12px; background:transparent; outline:none; border-bottom: 1px solid #3b82f6; font-size:1rem; letter-spacing:0; text-align:left;"></td>
+                <td style="padding:0"><input class="inp-cred" type="number" value="3" style="width:100%; border:none; padding:12px; background:transparent; outline:none; font-size:1rem; letter-spacing:0; text-align:left;"></td>
+                <td style="padding:0; text-align:center;"><button title="Eliminar fila" tabindex="-1" onclick="this.closest('tr').remove()" style="background:transparent; border:none; color:#ef4444; font-size:1.2rem; cursor:pointer;">✖</button></td>
+            </tr>`);
+        }
+        
+        async function saveCursos(btnElement) {
+            const trs = document.querySelectorAll('#courses-tbody tr');
+            let dataObj = {
+                "Cursos Obligatorios": [],
+                "Cursos Electivos": []
+            };
+            
+            trs.forEach(tr => {
+                const cat = tr.querySelector('.inp-cat') ? tr.querySelector('.inp-cat').value : null;
+                const id = tr.querySelector('.inp-id') ? tr.querySelector('.inp-id').value.trim() : null;
+                const nom = tr.querySelector('.inp-nom') ? tr.querySelector('.inp-nom').value.trim() : null;
+                const cred = tr.querySelector('.inp-cred') ? parseInt(tr.querySelector('.inp-cred').value) : 3;
+                
+                if(id && nom && dataObj[cat]) {
+                    dataObj[cat].push({id: id, nombre: nom, creditos: isNaN(cred) ? 0 : cred});
+                }
+            });
+            
+            btnElement.disabled = true;
+            btnElement.innerText = "Guardando...";
+            
+            try {
+                const response = await fetch('admin_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'save_cursos', cursos: dataObj })
+                });
+                const result = await response.json();
+                if(result.success) {
+                    alert('✅ ¡Catálogo actualizado con éxito!. Cualquier alumno que abra Preinscripción a partir de ahora verá los cambios instantáneamente.');
+                    document.getElementById('cursos-editor').style.display = 'none';
+                } else {
+                    alert('❌ Error al guardar datos: ' + result.message);
+                }
+            } catch(e) {
+                alert('❌ Fallo crítico al conectar con el servidor.');
+            }
+            
+            btnElement.disabled = false;
+            btnElement.innerText = "💾 Guardar Cambios Globales";
+        }
+        
+        // ---- Lógica de Visor de Alumnos y Tareas ----
+        let dbAlumnos = [];
+        
+        async function openAlumnosViewer() {
+            document.getElementById('home-editor').style.display = 'none';
+            document.getElementById('cursos-editor').style.display = 'none';
+            document.getElementById('fa-tasks-editor').style.display = 'none';
+            document.getElementById('alumnos-viewer').style.display = 'block';
+            document.getElementById('alumnos-viewer').scrollIntoView({behavior: 'smooth', block: 'end'});
+            
+            const ul = document.getElementById('lista-alumnos');
+            ul.innerHTML = "<li style='padding: 1.5rem; text-align: center; color: #64748b;'>Cargando base de datos de estudiantes...</li>";
+            document.getElementById('detalle-alumno-content').style.display = 'none';
+            document.getElementById('detalle-alumno-placeholder').style.display = 'block';
+            
+            try {
+                const response = await fetch('admin_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get_alumnos_y_tareas' })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    dbAlumnos = result.alumnos;
+                    renderListaAlumnos();
+                } else {
+                    ul.innerHTML = `<li style='padding: 1rem; color: #ef4444;'>Error: ${result.message}</li>`;
+                }
+            } catch(e) {
+                ul.innerHTML = "<li style='padding: 1rem; color: #ef4444;'>Error crítico de conexión JSON.</li>";
+            }
+        }
+        
+        function renderListaAlumnos() {
+            const ul = document.getElementById('lista-alumnos');
+            ul.innerHTML = '';
+            if(dbAlumnos.length === 0) {
+                ul.innerHTML = "<li style='padding: 1rem; text-align: center; color: #64748b;'>No hay alumnos registrados.</li>";
+                return;
+            }
+            
+            dbAlumnos.forEach((al, index) => {
+                let badgeColor = al.tareas.length > 0 ? '#10b981' : '#94a3b8';
+                ul.innerHTML += `
+                <li onclick="mostrarDetalleAlumno(${index})" style="padding: 1rem; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                    <strong style="color: #1e293b; display: block; font-size: 0.95rem;">${al.nombre}</strong>
+                    <div style="display:flex; justify-content: space-between; align-items:center; margin-top: 0.5rem;">
+                        <span style="color: #64748b; font-size: 0.8rem;">Cód: ${al.codigo}</span>
+                        <span style="background: ${badgeColor}; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">${al.tareas.length} Tareas</span>
+                    </div>
+                </li>`;
+            });
+        }
+        
+        function mostrarDetalleAlumno(index) {
+            const al = dbAlumnos[index];
+            document.getElementById('detalle-alumno-placeholder').style.display = 'none';
+            document.getElementById('detalle-alumno-content').style.display = 'block';
+            
+            document.getElementById('det-nombre').innerText = al.nombre;
+            document.getElementById('det-codigo').innerText = "Código Universitario: " + al.codigo;
+            document.getElementById('det-total').innerText = al.tareas.length;
+            
+            const lista = document.getElementById('det-lista-tareas');
+            lista.innerHTML = '';
+            
+            if(al.tareas.length === 0) {
+                lista.innerHTML = `<li style='color: #64748b; text-align: center; padding: 1.5rem; border: 1px dashed #cbd5e1; border-radius: 8px;'>El alumno no ha remitido ninguna tarea al servidor.</li>`;
+            } else {
+                al.tareas.sort((a,b) => parseInt(a.tarea_num) - parseInt(b.tarea_num)).forEach(t => {
+                    const filePath = `fisicaatomica20261/fisicaatomica/uploads/${t.archivo}`;
+                    lista.innerHTML += `
+                    <li style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                        <div>
+                            <strong style="color: #0f172a; display: block; margin-bottom: 0.35rem; font-size: 0.95rem;">📝 Tarea ${t.tarea_num}</strong>
+                            <span style="color: #64748b; font-size: 0.8rem; display: flex; align-items: center; gap: 4px;">🕒 Subida el: ${t.fecha_entrega}</span>
+                        </div>
+                        <a href="${filePath}" download target="_blank" title="Descargar archivo original" style="text-decoration: none; padding: 0.5rem 1.2rem; border-radius: 6px; font-size: 0.85rem; background: #eff6ff; color: #2563eb; font-weight: 600; border: 1px solid #bfdbfe; transition: all 0.2s;" onmouseover="this.style.background='#3b82f6'; this.style.color='white'" onmouseout="this.style.background='#eff6ff'; this.style.color='#2563eb'">Descargar Tarea</a>
+                    </li>`;
+                });
+            }
+        }
+
+        // ---- Lógica de Contenidos Home (CMS) ----
+        let quillEditor;
+        let adminAnunciosDB = [];
+
+        async function openHomeEditor() {
+            document.getElementById('cursos-editor').style.display = 'none';
+            document.getElementById('alumnos-viewer').style.display = 'none';
+            document.getElementById('fa-tasks-editor').style.display = 'none';
+            document.getElementById('home-editor').style.display = 'block';
+            document.getElementById('home-editor').scrollIntoView({behavior: 'smooth', block: 'end'});
+            
+            if (!quillEditor) {
+                quillEditor = new Quill('#ann-editor-container', {
+                    theme: 'snow',
+                    placeholder: 'Escribe el cuerpo detallado del mensaje...',
+                    modules: {
+                        toolbar: [
+                            ['bold', 'italic', 'underline'],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            [{ 'color': [] }]
+                        ]
+                    }
+                });
+            }
+            
+            cargarHomeAdmin();
+        }
+        
+        async function cargarHomeAdmin() {
+            try {
+                const res = await fetch('admin_api.php', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'get_home_content'})});
+                const result = await res.json();
+                if (result.success) {
+                    renderAdminAnuncios(result.data.anuncios || []);
+                    renderAdminDocumentos(result.data.documentos || []);
+                }
+            } catch(e) { console.error('Fallo cargando BD del portal:', e); }
+        }
+        
+        function renderAdminAnuncios(arr) {
+            adminAnunciosDB = arr;
+            document.getElementById('ann-contador').innerText = arr.length;
+            const container = document.getElementById('lista-anuncios-admin');
+            if (arr.length === 0) { container.innerHTML = '<p style="color:#94a3b8; font-size:0.9rem; text-align:center; padding:1rem 0;">Aún no se ha publicado ningún anuncio.</p>'; return; }
+            
+            let html = '';
+            arr.forEach((a, index) => {
+                let tempDiv = document.createElement("div");
+                tempDiv.innerHTML = a.texto;
+                let textPreview = tempDiv.textContent || tempDiv.innerText || "";
+                
+                html += `<div style="background:white; border:1px solid #e2e8f0; padding:12px; border-radius:6px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-start; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                    <div style="flex:1;"><h5 style="color:#1d4ed8; margin-bottom:4px; font-size:0.95rem;">${a.titulo}</h5><p style="font-size:0.8rem; color:#64748b; line-height:1.4; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${textPreview.substring(0, 150)}...</p></div>
+                    <div style="display:flex; flex-direction:column; gap:5px; margin-left:15px;">
+                        <button onclick="editarHomeAnuncio(${index})" title="Editar Anuncio" style="background:#dbeafe; border:1px solid #bfdbfe; color:#2563eb; border-radius:4px; padding:6px; cursor:pointer; font-size:1.1rem;">✏️</button>
+                        <button onclick="borrarHomeAnuncio('${a.id}')" title="Borrar Anuncio" style="background:#fee2e2; border:1px solid #fecaca; color:#ef4444; border-radius:4px; padding:6px; cursor:pointer; font-size:1.1rem;">🗑️</button>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function editarHomeAnuncio(index) {
+            const a = adminAnunciosDB[index];
+            document.getElementById('ann-titulo').value = a.titulo;
+            document.getElementById('ann-edit-id').value = a.id;
+            quillEditor.root.innerHTML = a.texto;
+            
+            const btn = document.getElementById('btn-pub-ann');
+            btn.innerText = "Guardar Cambios";
+            btn.style.background = "#3b82f6";
+            document.getElementById('btn-cancel-edit').style.display = "block";
+            
+            document.getElementById('ann-titulo').scrollIntoView({behavior: 'smooth', block: 'center'});
+        }
+
+        function cancelarEdicionAnn() {
+            document.getElementById('ann-titulo').value = '';
+            document.getElementById('ann-edit-id').value = '';
+            if (quillEditor) quillEditor.root.innerHTML = '';
+            
+            const btn = document.getElementById('btn-pub-ann');
+            btn.innerText = "Publicar Nuevo Anuncio";
+            btn.style.background = "#10b981";
+            document.getElementById('btn-cancel-edit').style.display = "none";
+        }
+
+        function renderAdminDocumentos(arr) {
+            document.getElementById('doc-contador').innerText = arr.length;
+            const container = document.getElementById('lista-documentos-admin');
+            if (arr.length === 0) { container.innerHTML = '<p style="color:#94a3b8; font-size:0.9rem; text-align:center; padding:1rem 0;">Carpeta institucional vacía.</p>'; return; }
+            
+            let html = '';
+            arr.forEach(d => {
+                html += `<li style="background:white; border:1px solid #e2e8f0; padding:10px 12px; border-radius:6px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                    <div style="overflow:hidden; flex:1;">
+                        <h5 style="color:#b45309; margin-bottom:2px; font-size:0.95rem; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">📄 ${d.titulo}</h5>
+                        <p style="font-size:0.75rem; color:#64748b; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; padding-right:10px;">${d.archivo_real} &bull; ${d.size}</p>
+                    </div>
+                    <button onclick="borrarHomeDocumento('${d.id}')" title="Eliminar del servidor permanentemente" style="background:#fee2e2; border:1px solid #fecaca; color:#ef4444; border-radius:4px; padding:6px; cursor:pointer; font-size:1.1rem; flex-shrink:0;">🗑️</button>
+                </li>`;
+            });
+            container.innerHTML = html;
+        }
+
+        async function publicarAnuncio() {
+            const tit = document.getElementById('ann-titulo').value.trim();
+            const txt = quillEditor.root.innerHTML;
+            const idEdit = document.getElementById('ann-edit-id').value;
+            
+            if (!tit || txt === '<p><br></p>') { alert("Para publicar necesitas escribir obligatoriamente título y cuerpo del mensaje."); return; }
+            
+            const btn = document.getElementById('btn-pub-ann');
+            btn.disabled = true; btn.innerText = "Guardando...";
+            
+            try {
+                await fetch('admin_api.php', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'save_home_announcement', id: idEdit, titulo: tit, texto: txt})});
+                cancelarEdicionAnn();
+                cargarHomeAdmin();
+            } catch(e) { alert("Error crítico."); }
+            btn.disabled = false;
+        }
+
+        // ---- Lógica de Tareas F. Atómica ----
+        let faTasksDB = [];
+
+        function openFaTasksEditor() {
+            document.getElementById('cursos-editor').style.display = 'none';
+            document.getElementById('alumnos-viewer').style.display = 'none';
+            document.getElementById('home-editor').style.display = 'none';
+            document.getElementById('fa-tasks-editor').style.display = 'block';
+            document.getElementById('fa-tasks-editor').scrollIntoView({behavior: 'smooth', block: 'start'});
+            cargarFaTasks();
+        }
+
+        async function cargarFaTasks() {
+            try {
+                const res = await fetch('admin_api.php', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'get_fa_tasks'})});
+                const result = await res.json();
+                if (result.success) renderFaTasksList(result.data);
+            } catch(e) { console.error('Error fetching FA tasks', e); }
+        }
+        
+        function renderFaTasksList(arr) {
+            faTasksDB = arr || [];
+            document.getElementById('fa-tasks-count').innerText = faTasksDB.length;
+            const container = document.getElementById('lista-fa-tasks');
+            if (faTasksDB.length === 0) { container.innerHTML = '<p style="color:#94a3b8; font-size:0.9rem; text-align:center;">No hay tareas configuradas. Los alumnos verán su panel vacío.</p>'; return; }
+            
+            let html = '';
+            faTasksDB.forEach((t, i) => {
+                html += `<div style="background:white; border:1px solid #e2e8f0; border-left:4px solid #8b5cf6; padding:12px; border-radius:6px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-start; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                    <div style="flex:1;">
+                        <h5 style="color:#0f172a; margin-bottom:4px; font-size:0.95rem;">${t.titulo}</h5>
+                        <p style="font-size:0.8rem; color:#64748b; white-space:pre-wrap; line-height:1.4;">${t.descripcion || 'Sin descripción adicional'}</p>
+                        ${t.archivo ? `<p style="margin-top:6px; font-size:0.75rem; font-weight:700; color:#d97706; display:flex; align-items:center; gap:4px;">📄 Archivo Asignado</p>` : ''}
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:5px; margin-left:15px; flex-shrink:0;">
+                        <button onclick="editarFaTask(${i})" title="Editar" style="background:#ede9fe; border:1px solid #ddd6fe; color:#7c3aed; border-radius:4px; padding:4px 8px; cursor:pointer;">✏️</button>
+                        <button onclick="borrarFaTask('${t.id}')" title="Eliminar" style="background:#fee2e2; border:1px solid #fecaca; color:#ef4444; border-radius:4px; padding:4px 8px; cursor:pointer;">🗑️</button>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function editarFaTask(index) {
+            const t = faTasksDB[index];
+            document.getElementById('fa-task-titulo').value = t.titulo;
+            document.getElementById('fa-task-desc').value = t.descripcion;
+            document.getElementById('fa-task-edit-id').value = t.id;
+            
+            const btn = document.getElementById('btn-pub-fa-task');
+            btn.innerText = "Guardar Cambios";
+            btn.style.background = "#3b82f6";
+            document.getElementById('btn-cancel-fa-task').style.display = "block";
+        }
+        
+        function cancelarEdicionFaTask() {
+            document.getElementById('fa-task-titulo').value = '';
+            document.getElementById('fa-task-desc').value = '';
+            document.getElementById('fa-task-edit-id').value = '';
+            document.getElementById('fa-task-archivo').value = '';
+            
+            const btn = document.getElementById('btn-pub-fa-task');
+            btn.innerText = "Habilitar Asignación";
+            btn.style.background = "#8b5cf6";
+            document.getElementById('btn-cancel-fa-task').style.display = "none";
+        }
+
+        async function guardarFaTask() {
+            const tit = document.getElementById('fa-task-titulo').value.trim();
+            const desc = document.getElementById('fa-task-desc').value.trim();
+            const idEdit = document.getElementById('fa-task-edit-id').value;
+            const fileInput = document.getElementById('fa-task-archivo');
+            const file = fileInput.files[0];
+            
+            if (!tit) { alert("El título es obligatorio."); return; }
+            
+            const btn = document.getElementById('btn-pub-fa-task');
+            btn.disabled = true; btn.innerText = "Guardando...";
+            
+            const fd = new FormData();
+            fd.append('action', 'save_fa_task');
+            if (idEdit) fd.append('id', idEdit);
+            fd.append('titulo', tit);
+            fd.append('descripcion', desc);
+            if (file) fd.append('archivo_pdf', file);
+            
+            try {
+                const res = await fetch('admin_api.php', { method: 'POST', body: fd });
+                const json = await res.json();
+                if (json.success) {
+                    cancelarEdicionFaTask();
+                    cargarFaTasks();
+                } else { alert("Fallo: " + json.message); }
+            } catch(e) { alert("Error crítico de comunicación."); }
+            btn.disabled = false;
+        }
+        
+        async function borrarFaTask(id) {
+            if(!confirm("¿Seguro que deseas eliminar esta tarea? Desaparecerá del portal de alumnos.")) return;
+            await fetch('admin_api.php', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'delete_fa_task', id: id})});
+            cargarFaTasks();
+        }
+
+        
+        async function subirDocumento() {
+            const tit = document.getElementById('doc-titulo').value.trim();
+            const input = document.getElementById('doc-archivo');
+            const file = input.files[0];
+            const dErr = document.getElementById('doc-err');
+            
+            if (!tit || !file) { 
+                dErr.innerText = 'Debes redactar un título público y adjuntar un archivo.'; 
+                dErr.style.display = 'block'; 
+                return; 
+            }
+            
+            dErr.style.display = 'none';
+            const btn = document.getElementById('btn-pub-doc');
+            btn.disabled = true; btn.innerText = "Codificando binario...";
+            
+            const fd = new FormData();
+            fd.append('action', 'upload_home_document');
+            fd.append('titulo', tit);
+            fd.append('archivo', file);
+            
+            try {
+                const res = await fetch('admin_api.php', { method: 'POST', body: fd });
+                const json = await res.json();
+                if (json.success) {
+                    input.value = '';
+                    document.getElementById('doc-titulo').value = '';
+                    cargarHomeAdmin();
+                } else {
+                    dErr.innerText = 'Error: ' + json.message;
+                    dErr.style.display = 'block';
+                }
+            } catch(e) { dErr.innerText = 'Fallo subiendo binario.'; dErr.style.display='block'; }
+            btn.disabled = false; btn.innerText = "Subir y Habilitar Descarga";
+        }
+        
+        async function borrarHomeAnuncio(id) {
+            if(!confirm("¿Seguro que deseas eliminar esta comunicación del muro de bienvenida? Desaparecerá de inmediato.")) return;
+            await fetch('admin_api.php', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'delete_home_announcement', id: id})});
+            cargarHomeAdmin();
+        }
+        
+        async function borrarHomeDocumento(id) {
+            if(!confirm("¿Borrar definitivamente este archivo de los discos del servidor? Esto anulará el link de descarga automáticamente.")) return;
+            await fetch('admin_api.php', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'delete_home_document', id: id})});
+            cargarHomeAdmin();
+        }
+    </script>
+</body>
+</html>

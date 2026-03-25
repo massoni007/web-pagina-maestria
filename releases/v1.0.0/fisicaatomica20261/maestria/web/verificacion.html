@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Correo - Maestría</title>
+    <!-- Modern web fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Animated background elements -->
+    <div class="background-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+    
+    <!-- Main Title -->
+    <h1 class="page-title">Verificación de Acceso</h1>
+
+    <div class="two-column-layout" style="max-width: 850px; margin-top: 20px;">
+        
+        <!-- Left Column: Instrucciones / Ayuda -->
+        <div class="container glass-panel" style="margin: 0; display: flex; flex-direction: column; justify-content: center;">
+            <div class="header" style="margin-bottom: 20px;">
+                <h2 style="margin-bottom: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 10px; color: #58a6ff;">💡 Guía Paso a Paso</h2>
+            </div>
+            
+            <div style="text-align: left; color: #e2e8f0; line-height: 1.6;">
+                <p style="margin-bottom: 1.5rem; color: #8b949e;">Has iniciado el proceso de preinscripción. Por favor sigue estos pasos para asegurar tu cupo de matrícula:</p>
+                
+                <ul style="list-style-position: outside; margin-left: 1.2rem; color: #c9d1d9; line-height: 1.6; font-size: 0.95rem;">
+                    <li style="margin-bottom: 0.8rem;"><b>Identificación segura:</b> Ingresa a continuación tu correo electrónico y presiona "Enviar Código".</li>
+                    <li style="margin-bottom: 0.8rem;"><b>Autenticación:</b> Revisa tu bandeja de entrada o de SPAM. Hemos enviado un código de 6 dígitos único. Ingrésalo en la casilla inferior.</li>
+                    <li style="margin-bottom: 0.8rem;"><b>Selección de Cursos:</b> Una vez verificada tu identidad, accederás de inmediato al formulario oficial para armar tu horario.</li>
+                    <li>¡No olvides presionar "Terminar" tras escoger tus áreas para grabar los datos!</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Right Column: Verification Form -->
+        <div class="container glass-panel" style="margin: 0;">
+            <div class="header">
+                <div class="icon-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                </div>
+                <h2>Verificación de Cuenta</h2>
+                <p style="margin-top: 10px;">Ingresa tu correo electrónico para recibir tu código de acceso por email.</p>
+            </div>
+
+            <!-- Step 1: Request Code Form -->
+            <form id="email-form">
+                <div class="input-group">
+                    <label for="email">Correo Electrónico</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"></path>
+                        </svg>
+                        <input type="email" id="email" name="email" placeholder="usuario@institucion.edu" required autocomplete="email">
+                    </div>
+                </div>
+
+                <button type="submit" id="submit-btn-email">
+                    <span class="btn-text">Enviar Código</span>
+                    <span class="loader" style="display: none;"></span>
+                </button>
+            </form>
+
+            <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 25px 0;">
+            <h3 style="color: white; margin-bottom: 10px; font-size: 1rem;">¿Ya tienes un código?</h3>
+            
+            <!-- Step 2: Verify Code Form -->
+            <form id="code-form">
+                <div class="input-group">
+                    <label for="code">Ingrese el Código de Verificación</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input type="text" id="code" name="code" placeholder="Vacío para omitir" autocomplete="off">
+                    </div>
+                </div>
+
+                <button type="submit" id="submit-btn-code">
+                    <span class="btn-text">Verificar Cuenta</span>
+                    <span class="loader" style="display: none;"></span>
+                </button>
+            </form>
+
+            <!-- Message rendering spot -->
+            <div id="message-container" class="message hidden"></div>
+        </div>
+    </div>
+
+    <!-- Main Logic script -->
+    <script src="verificacion.js?v=2.0"></script>
+</body>
+</html>
