@@ -1,0 +1,6 @@
+.git\
+.gitignore
+releases\
+brain\
+.gemini\
+node_modules\
