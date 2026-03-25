@@ -1,0 +1,11 @@
+# Ignorar archivos locales de sesión y temporales
+/tmp/
+*.log
+.DS_Store
+Thumbs.db
+codigo_admin_recibido.txt
+
+# Ignorar datos dinámicos generados por el portal (para no sobreescribir configuraciones en el servidor prod)
+# Comenta estas líneas si quieres versionar también la data inicial
+# data/
+# fisicaatomica20261/fisicaatomica/uploads/

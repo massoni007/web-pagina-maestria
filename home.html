@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Coordinación - PUCP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; padding: 2rem; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        
+        .header {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
+            padding: 4rem 3rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 60%);
+            z-index: 0;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header h1 { font-size: 2.8rem; font-weight: 800; margin-bottom: 1rem; line-height: 1.2; }
+        .header p { font-size: 1.2rem; color: #94a3b8; font-weight: 500; }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+        }
+        .card h2 {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #334155;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 0.75rem;
+        }
+        
+        /* Anuncios */
+        .announcement {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1.25rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        .announcement h3 { font-size: 1.1rem; color: #1e40af; margin-bottom: 0.5rem; }
+        .announcement p { font-size: 0.95rem; color: #475569; line-height: 1.5; }
+        .announcement .date { font-size: 0.8rem; color: #64748b; margin-top: 0.75rem; display: block; font-weight: 500; }
+        
+        /* Documentos */
+        .doc-list { list-style: none; margin-bottom: 1.5rem; }
+        .doc-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .doc-item:hover {
+            border-color: #3b82f6;
+            background: #f8fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .doc-info { display: flex; align-items: center; gap: 1rem; }
+        .doc-icon { font-size: 1.8rem; }
+        .doc-title { font-weight: 600; color: #334155; margin-bottom: 0.25rem; }
+        .doc-meta { font-size: 0.8rem; color: #94a3b8; }
+        .btn-upload {
+            width: 100%;
+            padding: 1rem;
+            background: #f1f5f9;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            color: #475569;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-upload:hover {
+            background: #eff6ff;
+            border-color: #3b82f6;
+            color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1 style="font-size: 2.3rem;">Gestión de la Maestría en Física (PUCP)</h1>
+                <p style="margin-bottom: 1.5rem; line-height: 1.5;">Página personal del Director de la Maestría, <strong>Eduardo Massoni</strong>, para gestionar la maestría en física de la Pontificia Universidad Católica del Perú.</p>
+                <div style="display: inline-block; padding: 0.5rem 1.2rem; background: rgba(255, 255, 255, 0.1); border-radius: 50px; font-size: 0.85rem; border: 1px solid rgba(255, 255, 255, 0.2); color: #cbd5e1;">
+                    ⚠️ Plataforma de gestión interna (No es una página oficial de la PUCP)
+                </div>
+            </div>
+        </header>
+        
+        <div class="grid">
+            <!-- Sección de Anuncios -->
+            <section class="card">
+                <h2>📢 Anuncios</h2>
+                <div id="home-anuncios-container">
+                    <p style="color: #64748b; font-size: 0.9rem; text-align: center; margin-top: 1rem; margin-bottom: 1rem;">Conectando con servidor institucional...</p>
+                </div>
+            </section>
+            
+            <!-- Sección de Documentos -->
+            <section class="card">
+                <h2>📁 Información y Documentos</h2>
+                <p style="color: #64748b; margin-bottom: 1.5rem; font-size: 0.95rem;">Directrices, calendarios y formatos oficiales de la maestría.</p>
+                
+                <ul class="doc-list" id="home-documentos-container">
+                    <p style="color: #64748b; font-size: 0.9rem; text-align: center; margin-top: 1rem; margin-bottom: 1rem;">Sincronizando archivos públicos...</p>
+                </ul>
+            </section>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await fetch('admin_api.php', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'get_home_content'})});
+                const result = await res.json();
+                if(result.success) {
+                    renderAnuncios(result.data.anuncios || []);
+                    renderDocumentos(result.data.documentos || []);
+                }
+            } catch(e) { console.error('Error al sincronizar datos del portal', e); }
+        });
+        
+        function renderAnuncios(arr) {
+            const container = document.getElementById('home-anuncios-container');
+            if (arr.length === 0) { container.innerHTML = '<p style="color:#94a3b8; font-style:italic; text-align:center; margin: 1.5rem 0;">No hay comunicados oficiales recientes.</p>'; return; }
+            let html = '';
+            arr.forEach(a => {
+                // Darle vuelta a la fecha para formato humano simple:
+                let parts = a.fecha.split('-');
+                let fechaStr = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : a.fecha;
+                html += `
+                <div class="announcement">
+                    <h3>${a.titulo}</h3>
+                    <div class="ann-content" style="font-size: 0.95rem; line-height: 1.6; color: #334155; margin-bottom: 0.8rem;">${a.texto}</div>
+                    <span class="date">📅 Publicado: ${fechaStr}</span>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+        
+        function renderDocumentos(arr) {
+            const container = document.getElementById('home-documentos-container');
+            if (arr.length === 0) { container.innerHTML = '<p style="color:#94a3b8; font-style:italic; text-align:center; margin: 1.5rem 0;">No se ha publico ningún documento de descarga.</p>'; return; }
+            let html = '';
+            arr.forEach(d => {
+                let icon = '📄';
+                if(d.tipo.includes('Cálculo')) icon = '📊';
+                else if(d.tipo.includes('Imagen')) icon = '🖼️';
+                else if(d.tipo.includes('Carpeta')) icon = '📁';
+                
+                html += `
+                <li class="doc-item" onclick="window.open('${d.ruta}', '_blank')">
+                    <div class="doc-info">
+                        <span class="doc-icon">${icon}</span>
+                        <div>
+                            <div class="doc-title">${d.titulo}</div>
+                            <div class="doc-meta" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;" title="${d.archivo_real}">${d.tipo} &bull; ${d.size} &bull; ${d.archivo_real}</div>
+                        </div>
+                    </div>
+                    <a href="${d.ruta}" download style="color: #3b82f6; text-decoration: none; background: #eff6ff; padding: 6px 16px; border-radius: 20px; font-weight: 600; font-size: 0.85rem; border: 1px solid #bfdbfe; transition: 0.2s;" onmouseover="this.style.background='#3b82f6'; this.style.color='white'" onmouseout="this.style.background='#eff6ff'; this.style.color='#3b82f6'" onclick="event.stopPropagation();">Descargar</a>
+                </li>`;
+            });
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
