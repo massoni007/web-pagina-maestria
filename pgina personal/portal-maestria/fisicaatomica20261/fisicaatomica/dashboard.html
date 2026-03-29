@@ -19,8 +19,17 @@
         
         <div class="glass-panel" style="margin-bottom: 30px; text-align: left; padding: 20px; border-left: 4px solid #58a6ff;">
             <h3 style="margin-bottom: 10px; color: #58a6ff; display: flex; align-items: center; gap: 8px;">ℹ️ Cómo subir tus tareas al sistema</h3>
-            <p style="font-size: 0.95rem; line-height: 1.6; color: #c9d1d9;">Para entregar una asignación, haz clic en el botón <b>"Elegir archivo"</b> debajo del número de tarea correspondiente (formato OBLIGATORIO: PDF). Luego presiona el botón azul <b>"Subir PDF"</b>.<br><br>Espera unos segundos a que el sistema procese tu documento. Cuando termine exitosamente, el recuadro se tornará verde oscuro, dirá "Entregada" e incluirá la constancia de subida con tu fecha y enlace de descarga originenal. <i>¡Solo se permite una subida por tarea, revisa bien tu archivo antes de enviarlo!</i></p>
+            <p style="font-size: 0.95rem; line-height: 1.6; color: #c9d1d9;">Para entregar una asignación, haz clic en el botón <b>"Elegir archivo"</b> debajo del número de tarea correspondiente (formato OBLIGATORIO: PDF). Luego presiona el botón azul <b>"Subir PDF"</b>.<br><br>Espera unos segundos a que el sistema procese tu documento. Cuando termine exitosamente, el recuadro se tornará verde oscuro, dirá "Entregada" e incluirá la constancia de subida. <b>¿Te equivocaste de archivo?</b> No te preocupes, puedes usar el botón "Reemplazar entrega" para subir una versión corregida.</p>
         </div>
+
+        <div id="docsSection" style="display: none; margin-bottom: 30px;">
+            <h2 style="color: #c9d1d9; border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-bottom: 20px;">📚 Materiales y Documentos del Curso</h2>
+            <div class="tasks-grid" id="docsContainer">
+                <!-- Documentos generados por JS -->
+            </div>
+        </div>
+
+        <h2 style="color: #c9d1d9; border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-bottom: 20px;">📝 Tareas y Asignaciones</h2>
 
         <div class="tasks-grid" id="tasksContainer">
             <!-- Tareas generadas por JS -->
@@ -52,6 +61,9 @@
                 
                 if(data.success) {
                     renderTasks(data);
+                    if (data.documentos) {
+                        renderDocs(data.documentos);
+                    }
                 } else {
                     container.innerHTML = `<div class="error-msg" style="display:block">Error: ${data.error}</div>`;
                 }
@@ -96,8 +108,9 @@
                         <div class="completion-info" style="margin-top:15px;">
                             <span>✅ Subido el: ${entregadas[i].fecha_entrega}</span>
                         </div>
-                        <div class="completion-info" style="margin-top:5px">
-                            <span><a href="uploads/${entregadas[i].archivo}" target="_blank" download style="color:#58a6ff; text-decoration:none; font-weight:600;">⬇️ Descargar mi archivo</a></span>
+                        <div class="completion-info" style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+                            <a href="uploads/${entregadas[i].archivo}" target="_blank" download style="color:#58a6ff; text-decoration:none; font-weight:600; font-size:0.9rem;">⬇️ Descargar mi archivo solución</a>
+                            <button onclick="replaceTask(${i})" style="background:rgba(248, 81, 73, 0.1); border:1px solid rgba(248, 81, 73, 0.2); color:#ff7b72; cursor:pointer; font-size:0.8rem; font-weight:600; padding:6px 12px; border-radius:6px; text-decoration:none; width:fit-content; transition: 0.2s;" onmouseover="this.style.background='rgba(248, 81, 73, 0.2)'" onmouseout="this.style.background='rgba(248, 81, 73, 0.1)'">🔄 Reemplazar entrega</button>
                         </div>
                     `;
                 } else {
@@ -113,6 +126,27 @@
                 card.innerHTML = contentHTML;
                 container.appendChild(card);
             });
+        }
+
+        async function replaceTask(taskNum) {
+            if(!confirm('¿Estás seguro de que quieres eliminar tu entrega actual para subir una nueva?')) return;
+            
+            const formData = new FormData();
+            formData.append('action', 'delete_task');
+            formData.append('codigo', cod);
+            formData.append('tarea_num', taskNum);
+            
+            try {
+                const res = await fetch('api.php', { method: 'POST', body: formData });
+                const data = await res.json();
+                if(data.success) {
+                    loadTasks();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch(e) {
+                alert('No se pudo conectar con el servidor.');
+            }
         }
 
         async function uploadTask(e, taskNum) {
@@ -153,6 +187,47 @@
                 btn.textContent = 'Reintentar Subida';
                 btn.disabled = false;
             }
+        }
+
+        function renderDocs(docs) {
+            const container = document.getElementById('docsContainer');
+            const section = document.getElementById('docsSection');
+            
+            if (!docs || docs.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            container.innerHTML = '';
+            
+            docs.forEach(doc => {
+                const card = document.createElement('div');
+                card.className = 'task-card';
+                card.style.borderColor = '#16a34a';
+                
+                // Extraer el nombre de archivo limpio de "data/uploads/fa_docs/DOC_213123_algo.pdf"
+                let fileName = 'Descargar Archivo';
+                if (doc.archivo) {
+                    const parts = doc.archivo.split('/');
+                    fileName = parts[parts.length - 1];
+                }
+
+                card.innerHTML = `
+                    <div class="task-header" style="flex-wrap: nowrap;">
+                        <div style="flex:1;">
+                            <h3 style="margin-bottom:6px; color:#4ade80; font-size:1.15rem;">📄 ${doc.titulo}</h3>
+                            <p style="font-size:0.85rem; color:#8b949e; font-weight:normal; line-height:1.5; margin-right:10px;">${doc.descripcion || ''}</p>
+                            ${doc.archivo ? `
+                            <div style="margin-top: 15px; background: rgba(22, 163, 74, 0.1); padding: 10px; border-radius: 6px; border: 1px dashed rgba(22, 163, 74, 0.3);">
+                                <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 5px;">Archivo adjunto: ${fileName}</p>
+                                <a href="../../${doc.archivo}" target="_blank" style="display:inline-block; font-size:0.9rem; font-weight:600; color:#4ade80; text-decoration:none; padding:6px 14px; background: rgba(22,163,74,0.15); border-radius: 4px; border: 1px solid rgba(22,163,74,0.3); transition: 0.2s;" onmouseover="this.style.background='rgba(22,163,74,0.25)'" onmouseout="this.style.background='rgba(22,163,74,0.15)'">📥 Abrir Documento</a>
+                            </div>` : ''}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
 
         // Initialize

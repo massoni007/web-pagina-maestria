@@ -101,6 +101,8 @@
                     <p>Revisa las tareas enviadas, visualiza las calificaciones y el estado de los estudiantes.</p>
                     <button class="btn btn-primary" style="padding: 0.6rem; margin-bottom: 0.5rem;" onclick="openAlumnosViewer()">Ver Estudiantes y Tareas</button>
                     <button class="btn btn-secondary" style="padding: 0.6rem; background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; width: 100%;" onclick="openFaTasksEditor()">📋 Gestor de Asignaciones</button>
+                    <button class="btn btn-secondary" style="padding: 0.6rem; margin-top: 10px; background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; width: 100%;" onclick="openFaDocsEditor()">📚 Gestor de Documentos de Clase</button>
+                    <button class="btn btn-danger" style="padding: 0.6rem; margin-top: 1rem; width: 100%; font-size: 0.85rem; background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;" onclick="resetFaSystem()">⚠ Reiniciar Sistema 2026-1</button>
                 </div>
                 <div class="dash-card">
                     <h3>📝 Preinscripciones 2026-2</h3>
@@ -195,6 +197,35 @@
                     <button class="btn btn-danger" style="background: #ef4444; width: auto; padding: 0.8rem 2rem;" onclick="document.getElementById('fa-tasks-editor').style.display='none'">Ocultar Gestor</button>
                 </div>
             </div>
+            <!-- Gestor de Documentos (Física Atómica) -->
+            <div id="fa-docs-editor" style="display: none; margin-top: 3rem; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
+                <h3 style="margin-bottom: 0.5rem; color: #0f172a; font-size: 1.5rem;">📚 Gestor de Documentos de Clase</h3>
+                <p style="margin-bottom: 1.5rem; color: #64748b;">Añade sílabos, lecturas o PDF de la clase. Estarán visibles en la sección principal del alumno.</p>
+                
+                <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 300px; background: #f0fdf4; padding: 1.5rem; border-radius: 8px; border: 1px solid #bbf7d0;">
+                        <h4 style="margin-bottom: 1rem; color: #166534;">Subir / Editar Documento</h4>
+                        <input type="text" id="fa-doc-titulo" placeholder="Título (ej: Sílabo 2026-1)" style="width: 100%; border: 1px solid #bbf7d0; border-radius: 4px; padding: 0.6rem; margin-bottom: 0.5rem;">
+                        <textarea id="fa-doc-desc" placeholder="Descripción breve y opcional..." style="width: 100%; border: 1px solid #bbf7d0; border-radius: 4px; padding: 0.6rem; margin-bottom: 0.5rem; height: 60px; resize: vertical;"></textarea>
+                        <input type="file" id="fa-doc-archivo" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip" style="width: 100%; border: 1px solid #bbf7d0; padding: 0.4rem; border-radius: 4px; margin-bottom: 1rem; background: white;">
+                        <input type="hidden" id="fa-doc-edit-id" value="">
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <button id="btn-pub-fa-doc" onclick="guardarFaDoc()" style="flex: 1; background: #16a34a; color: white; border: none; padding: 0.6rem; border-radius: 6px; font-weight: 600; cursor: pointer;">Publicar Documento</button>
+                            <button id="btn-cancel-fa-doc" onclick="cancelarEdicionFaDoc()" style="display: none; background: #ef4444; color: white; border: none; padding: 0.6rem; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancelar</button>
+                        </div>
+                    </div>
+                    
+                    <div style="flex: 1; min-width: 300px; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <h4 style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; color: #0f172a;">Documentos Activos <span id="fa-docs-count" style="background:#16a34a;color:white;padding:2px 8px;border-radius:12px;font-size:0.8rem;">0</span></h4>
+                        <div id="lista-fa-docs" style="max-height: 250px; overflow-y: auto; padding-right: 5px;"></div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: right; border-top: 2px solid #e2e8f0; padding-top: 1.5rem;">
+                    <button class="btn btn-danger" style="background: #ef4444; width: auto; padding: 0.8rem 2rem;" onclick="document.getElementById('fa-docs-editor').style.display='none'">Ocultar Gestor</button>
+                </div>
+            </div>
 
             <!-- Editor de Cursos (Estilo Excel) -->
             <div id="cursos-editor" style="display: none; margin-top: 3rem; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
@@ -229,7 +260,18 @@
             <!-- Visor de Alumnos y Tareas (Física Atómica) -->
             <div id="alumnos-viewer" style="display: none; margin-top: 3rem; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
                 <h3 style="margin-bottom: 0.5rem; color: #0f172a; font-size: 1.5rem;">👨‍🎓 Estudiantes de Física Atómica</h3>
-                <p style="margin-bottom: 1.5rem; color: #64748b;">Selecciona un estudiante para ver el historial consolidado de las tareas que ha subido al servidor seguro.</p>
+                <p style="margin-bottom: 1rem; color: #64748b;">Selecciona un estudiante para ver el historial consolidado de las tareas que ha subido al servidor seguro.</p>
+                
+                <div style="background: #fdf2f2; border: 1px dashed #f87171; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                    <h4 style="color: #991b1b; font-size: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 8px;">📥 Importar Padrón Oficial (CSV PUCP)</h4>
+                    <p style="font-size: 0.85rem; color: #7f1d1d; margin-bottom: 1rem; line-height: 1.4;">
+                        <strong>Nota Importante:</strong> Usted debe descargar de la página del intranet de la PUCP el archivo (que suele venir en formato Excel). <strong>Antes de subirlo, ábralo en Excel, vaya a "Guardar como..." y elija el formato "CSV (delimitado por comas)"</strong>. El sistema requiere estrictamente el archivo .csv para detectar automáticamente los nombres y códigos.
+                    </p>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <input type="file" id="csv-alumnos-file" accept=".csv" style="flex: 1; min-width: 200px; padding: 0.4rem; background: white; border: 1px solid #fecaca; border-radius: 6px; font-size: 0.85rem;">
+                        <button onclick="subirPadronCsv()" class="btn btn-primary" style="width: auto; background: #dc2626; padding: 0.5rem 1.5rem;">Actualizar Base de Datos</button>
+                    </div>
+                </div>
                 
                 <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
                     <!-- Lista de alumnos -->
@@ -531,7 +573,7 @@
                 <li onclick="mostrarDetalleAlumno(${index})" style="padding: 1rem; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
                     <strong style="color: #1e293b; display: block; font-size: 0.95rem;">${al.nombre}</strong>
                     <div style="display:flex; justify-content: space-between; align-items:center; margin-top: 0.5rem;">
-                        <span style="color: #64748b; font-size: 0.8rem;">Cód: ${al.codigo}</span>
+                        <span style="color: #64748b; font-size: 0.8rem;">Cód: ${al.codigo} ${al.email ? ` | <span style="color:#3b82f6">${al.email}</span>` : ''}</span>
                         <span style="background: ${badgeColor}; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">${al.tareas.length} Tareas</span>
                     </div>
                 </li>`;
@@ -794,6 +836,87 @@
         }
 
         
+        async function resetFaSystem() {
+            const confirm1 = confirm("❗ ATENCIÓN: Estás a punto de BORRAR TODAS las entregas de los estudiantes, la lista de alumnos inscritos y las tareas configuradas para Física Atómica.\n\n¿Deseas continuar?");
+            if (!confirm1) return;
+            
+            const confirm2 = confirm("🚨 ÚLTIMA ADVERTENCIA: Esta acción es permanente y no se puede deshacer. Se borrarán archivos físicos y registros del servidor para iniciar el ciclo 2026-1 en blanco.\n\n¿Estás absolutamente seguro?");
+            if (!confirm2) return;
+            
+            const confirm3 = prompt("Escribe 'REINICIAR TODO' para confirmar el borrado total del sistema:");
+            if (confirm3 !== 'REINICIAR TODO') {
+                alert("Confirmación fallida. No se realizó ningún cambio.");
+                return;
+            }
+
+            try {
+                const response = await fetch('admin_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'reset_fa_system' })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert("✅ " + result.message);
+                    if (document.getElementById('alumnos-viewer').style.display === 'block') openAlumnosViewer();
+                    if (document.getElementById('fa-tasks-editor').style.display === 'block') cargarFaTasks();
+                } else {
+                    alert("❌ Error: " + result.message);
+                }
+            } catch (e) {
+                alert("❌ Error crítico de conexión con el servidor.");
+            }
+        }
+
+        async function subirPadronCsv() {
+            const fileInput = document.getElementById('csv-alumnos-file');
+            const file = fileInput.files[0];
+            if (!file) { alert("Por favor seleccione el archivo CSV oficial de la PUCP."); return; }
+            
+            // Validar extensión en frontend
+            const fileName = file.name.toLowerCase();
+            if (fileName.endsWith('.xls') || fileName.endsWith('.xlsx')) {
+                alert("❌ Formato incorrecto.\n\nHas intentado subir un archivo Excel (" + fileName + ").\nDebes abrir ese archivo en Excel, ir a 'Archivo' -> 'Guardar como' y seleccionar el formato 'CSV (delimitado por comas)' antes de subirlo al portal.");
+                return;
+            }
+
+            if (!confirm("❗ ATENCIÓN: Esta acción reemplazará la lista actual de alumnos por los datos del archivo. ¿Deseas continuar?")) return;
+            
+            const btn = document.querySelector('button[onclick="subirPadronCsv()"]');
+            const oldText = btn.innerText;
+            btn.innerText = "Procesando...";
+            btn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('action', 'upload_fa_alumnos_csv');
+            formData.append('archivo', file);
+            
+            try {
+                const res = await fetch('admin_api.php', { method: 'POST', body: formData });
+                const text = await res.text();
+                
+                try {
+                    const result = JSON.parse(text);
+                    if (result.success) {
+                        alert("✅ " + result.message);
+                        openAlumnosViewer();
+                        fileInput.value = "";
+                    } else {
+                        alert("❌ " + result.message);
+                    }
+                } catch(parseErr) {
+                    console.error("Respuesta no válida del servidor:", text);
+                    alert("❌ Error crítico en el servidor. Respuesta:\n\n" + text.substring(0, 150));
+                }
+            } catch(e) { 
+                alert("❌ Error de comunicación con el servidor. Intente de nuevo."); 
+            }
+            
+            btn.innerText = oldText;
+            btn.disabled = false;
+        }
+
         async function subirDocumento() {
             const tit = document.getElementById('doc-titulo').value.trim();
             const input = document.getElementById('doc-archivo');
@@ -840,6 +963,113 @@
             if(!confirm("¿Borrar definitivamente este archivo de los discos del servidor? Esto anulará el link de descarga automáticamente.")) return;
             await fetch('admin_api.php', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'delete_home_document', id: id})});
             cargarHomeAdmin();
+        }
+        // ====== GESTIÓN DE DOCUMENTOS (FÍSICA ATÓMICA) ======
+        let faDocsDB = [];
+        
+        function openFaDocsEditor() {
+            document.getElementById('cursos-editor').style.display = 'none';
+            document.getElementById('alumnos-viewer').style.display = 'none';
+            document.getElementById('fa-tasks-editor').style.display = 'none';
+            document.getElementById('home-editor').style.display = 'none';
+            document.getElementById('fa-docs-editor').style.display = 'block';
+            document.getElementById('fa-docs-editor').scrollIntoView({behavior: 'smooth', block: 'end'});
+            cargarFaDocs();
+        }
+
+        async function cargarFaDocs() {
+            try {
+                const res = await fetch('admin_api.php', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'get_fa_docs'})});
+                const result = await res.json();
+                if (result.success) renderFaDocs(result.data || []);
+            } catch(e) { console.error('Fallo cargando Documentos FA:', e); }
+        }
+
+        function renderFaDocs(arr) {
+            faDocsDB = arr;
+            document.getElementById('fa-docs-count').innerText = arr.length;
+            const container = document.getElementById('lista-fa-docs');
+            if (arr.length === 0) { container.innerHTML = '<p style="color:#94a3b8; font-size:0.9rem; text-align:center;">No hay documentos subidos al portal.</p>'; return; }
+            
+            let html = '';
+            arr.forEach((d, i) => {
+                html += `<div style="background:white; border:1px solid #e2e8f0; border-left:4px solid #16a34a; padding:12px; border-radius:6px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-start; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                    <div style="flex:1;">
+                        <h5 style="color:#0f172a; margin-bottom:4px; font-size:0.95rem;">${d.titulo}</h5>
+                        <p style="font-size:0.8rem; color:#64748b; white-space:pre-wrap; line-height:1.4;">${d.descripcion || 'Sin descripción adicional'}</p>
+                        ${d.archivo ? `<a href="${d.archivo}" target="_blank" style="display:inline-block; margin-top:6px; font-size:0.75rem; font-weight:700; color:#16a34a; text-decoration:none;">📄 Ver Documento</a>` : ''}
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:5px; margin-left:15px; flex-shrink:0;">
+                        <button onclick="editarFaDoc(${i})" title="Editar" style="background:#dcfce7; border:1px solid #bbf7d0; color:#166534; border-radius:4px; padding:4px 8px; cursor:pointer;">✏️</button>
+                        <button onclick="borrarFaDoc('${d.id}')" title="Eliminar" style="background:#fee2e2; border:1px solid #fecaca; color:#ef4444; border-radius:4px; padding:4px 8px; cursor:pointer;">🗑️</button>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function editarFaDoc(index) {
+            const d = faDocsDB[index];
+            document.getElementById('fa-doc-titulo').value = d.titulo;
+            document.getElementById('fa-doc-desc').value = d.descripcion;
+            document.getElementById('fa-doc-edit-id').value = d.id;
+            
+            const btn = document.getElementById('btn-pub-fa-doc');
+            btn.innerText = "Guardar Cambios";
+            btn.style.background = "#3b82f6";
+            document.getElementById('btn-cancel-fa-doc').style.display = "block";
+        }
+        
+        function cancelarEdicionFaDoc() {
+            document.getElementById('fa-doc-titulo').value = '';
+            document.getElementById('fa-doc-desc').value = '';
+            document.getElementById('fa-doc-edit-id').value = '';
+            document.getElementById('fa-doc-archivo').value = '';
+            
+            const btn = document.getElementById('btn-pub-fa-doc');
+            btn.innerText = "Publicar Documento";
+            btn.style.background = "#16a34a";
+            document.getElementById('btn-cancel-fa-doc').style.display = "none";
+        }
+
+        async function guardarFaDoc() {
+            const tit = document.getElementById('fa-doc-titulo').value.trim();
+            const desc = document.getElementById('fa-doc-desc').value.trim();
+            const idEdit = document.getElementById('fa-doc-edit-id').value;
+            const fileInput = document.getElementById('fa-doc-archivo');
+            const file = fileInput.files[0];
+            
+            if (!tit) { alert("El título es obligatorio."); return; }
+            if (!idEdit && !file) { alert("Debes seleccionar un archivo para publicar un nuevo documento."); return; }
+            
+            const btn = document.getElementById('btn-pub-fa-doc');
+            btn.disabled = true; btn.innerText = "Guardando...";
+            
+            const fd = new FormData();
+            fd.append('action', 'save_fa_doc');
+            if (idEdit) fd.append('id', idEdit);
+            fd.append('titulo', tit);
+            fd.append('descripcion', desc);
+            if (file) fd.append('archivo_pdf', file);
+            
+            try {
+                const res = await fetch('admin_api.php', { method: 'POST', body: fd });
+                const json = await res.json();
+                if (json.success) {
+                    cancelarEdicionFaDoc();
+                    cargarFaDocs();
+                } else { alert("Fallo: " + json.message); }
+            } catch(e) { alert("Error crítico de comunicación."); }
+            btn.disabled = false;
+        }
+
+        async function borrarFaDoc(id) {
+            if (!confirm("¿Eliminar PERMANENTEMENTE este documento? El archivo físico también será borrado.")) return;
+            const param = { action: 'delete_fa_doc', id };
+            try {
+                await fetch('admin_api.php', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(param) });
+                cargarFaDocs();
+            } catch(e) {}
         }
     </script>
 </body>

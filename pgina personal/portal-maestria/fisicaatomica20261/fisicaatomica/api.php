@@ -58,17 +58,82 @@ if ($action === 'verify_code') {
         echo json_encode(["success" => false, "error" => "El código de 6 dígitos es incorrecto o ha expirado"]); exit;
     }
     
-    // Alumno verificado. Creamos cuenta de prueba 
-    // ya que no hay correos en CSV real.
-    $codigo_alumno = "TEST-" . strtoupper(substr(md5($email), 0, 4));
+    // Buscar al alumno en el padrón oficial (alumnos.csv)
+    $csvAlumnos = 'data/alumnos.csv';
+    $alumnoInfo = null;
+    
+    if (file_exists($csvAlumnos)) {
+        $lines = file($csvAlumnos, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $i => $line) {
+            if ($i === 0) continue;
+            $data = str_getcsv($line);
+            // Formato esperado: codigo,nombre,email,fecha_inscripcion
+            if (isset($data[2]) && strcasecmp(trim($data[2]), $email) === 0) {
+                $alumnoInfo = [
+                    "codigo" => $data[0],
+                    "nombre" => $data[1],
+                    "fecha_inscripcion" => $data[3] ?? date('d-m-Y')
+                ];
+                break;
+            }
+        }
+    }
+
+    // Si no está en el CSV, manejamos como Invitado (Externo)
+    if (!$alumnoInfo) {
+        $alumnoInfo = [
+            "codigo" => "EXT-" . strtoupper(substr(md5($email), 0, 4)),
+            "nombre" => "Alumno Externo ($email)",
+            "fecha_inscripcion" => date('d-m-Y')
+        ];
+    }
     
     echo json_encode([
         "success" => true,
-        "alumno" => [
-            "codigo" => $codigo_alumno,
-            "nombre" => "Invitado ($email)",
+        "alumno" => $alumnoInfo
+    ]);
+    exit;
+}
+
+if ($action === 'direct_test_login') {
+    $codigoParam = trim($_POST['codigo'] ?? '');
+    if (!$codigoParam) {
+        echo json_encode(["success" => false, "error" => "Debes ingresar un código válido"]); exit;
+    }
+    
+    // Buscar al alumno en el padrón oficial (alumnos.csv)
+    $csvAlumnos = 'data/alumnos.csv';
+    $alumnoInfo = null;
+    
+    if (file_exists($csvAlumnos)) {
+        $lines = file($csvAlumnos, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $i => $line) {
+            if ($i === 0) continue;
+            $data = str_getcsv($line);
+            // Formato esperado: codigo,nombre,email,fecha_inscripcion
+            if (isset($data[0]) && strcasecmp(trim($data[0]), $codigoParam) === 0) {
+                $alumnoInfo = [
+                    "codigo" => $data[0],
+                    "nombre" => $data[1],
+                    "fecha_inscripcion" => $data[3] ?? date('d-m-Y')
+                ];
+                break;
+            }
+        }
+    }
+
+    // Si no está en el CSV, manejamos como Invitado (Externo) para pruebas
+    if (!$alumnoInfo) {
+        $alumnoInfo = [
+            "codigo" => "TEST-" . strtoupper(substr(md5($codigoParam), 0, 4)),
+            "nombre" => "Usuario de Prueba ($codigoParam)",
             "fecha_inscripcion" => date('d-m-Y')
-        ]
+        ];
+    }
+    
+    echo json_encode([
+        "success" => true,
+        "alumno" => $alumnoInfo
     ]);
     exit;
 }
@@ -97,7 +162,18 @@ if ($action === 'get_tasks') {
         $definiciones = json_decode(file_get_contents($defFile), true) ?: [];
     }
     
-    echo json_encode(["success" => true, "entregadas" => $entregadas, "definicion_tareas" => $definiciones]);
+    $docsFile = '../../data/fa_docs_def.json';
+    $documentos = [];
+    if (file_exists($docsFile)) {
+        $documentos = json_decode(file_get_contents($docsFile), true) ?: [];
+    }
+    
+    echo json_encode([
+        "success" => true, 
+        "entregadas" => $entregadas, 
+        "definicion_tareas" => $definiciones,
+        "documentos" => $documentos
+    ]);
     exit;
 }
 
@@ -139,6 +215,55 @@ if ($action === 'upload_task') {
         echo json_encode(["success" => true, "fecha" => $fecha, "archivo" => $relativeFilePath]);
     } else {
         echo json_encode(["success" => false, "error" => "El servidor no pudo guardar el archivo físico"]);
+    }
+    exit;
+}
+
+if ($action === 'delete_task') {
+    $codigo = trim($_POST['codigo'] ?? '');
+    $tarea_num = (int)($_POST['tarea_num'] ?? 0);
+    
+    if (!$codigo || !$tarea_num) {
+        echo json_encode(["success" => false, "error" => "Datos insuficientes"]);
+        exit;
+    }
+    
+    $csvFile = 'data/tareas.csv';
+    if (!file_exists($csvFile)) {
+        echo json_encode(["success" => false, "error" => "No hay entregas registradas"]);
+        exit;
+    }
+    
+    $lines = file($csvFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $newLines = [];
+    $found = false;
+    $fileToDelete = '';
+    
+    foreach ($lines as $i => $line) {
+        if ($i === 0) {
+            $newLines[] = $line;
+            continue;
+        }
+        $data = str_getcsv($line, ',', '"', '\\');
+        if ($data[0] === $codigo && (int)$data[1] === $tarea_num) {
+            $found = true;
+            $fileToDelete = "uploads/" . $data[3];
+            // No lo agregamos a newLines para "borrarlo"
+        } else {
+            $newLines[] = $line;
+        }
+    }
+    
+    if ($found) {
+        // Guardar nuevo CSV
+        file_put_contents($csvFile, implode("\n", $newLines) . "\n");
+        // Borrar archivo físico si existe
+        if ($fileToDelete && file_exists($fileToDelete)) {
+            unlink($fileToDelete);
+        }
+        echo json_encode(["success" => true]);
+    } else {
+        echo json_encode(["success" => false, "error" => "No se encontró la entrega para borrar"]);
     }
     exit;
 }

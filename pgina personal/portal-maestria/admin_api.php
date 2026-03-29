@@ -126,6 +126,7 @@ if ($action === 'get_alumnos_y_tareas') {
                 $alumnos[$data[0]] = [
                     'codigo' => $data[0],
                     'nombre' => $data[1],
+                    'email' => $data[2] ?? '',
                     'tareas' => []
                 ];
             }
@@ -309,6 +310,116 @@ if ($action === 'delete_home_document') {
     exit;
 }
 
+// --- GESTIÓN DE DOCUMENTOS FÍSICA ATÓMICA ---
+$faDocsFile = 'data/fa_docs_def.json';
+
+function getFaDocsData($file) {
+    if (!file_exists($file)) return [];
+    $data = json_decode(file_get_contents($file), true);
+    return is_array($data) ? $data : [];
+}
+
+function saveFaDocsData($file, $d) {
+    file_put_contents($file, json_encode($d, JSON_PRETTY_PRINT));
+}
+
+if ($action === 'get_fa_docs') {
+    if (!isset($_SESSION['admin_logged_in'])) {
+        echo json_encode(['success'=>false, 'message'=>'No autorizado.']); exit;
+    }
+    echo json_encode(['success'=>true, 'data'=>getFaDocsData($faDocsFile)]);
+    exit;
+}
+
+if ($action === 'delete_fa_doc') {
+    if (!isset($_SESSION['admin_logged_in'])) {
+        echo json_encode(['success'=>false, 'message'=>'No autorizado.']); exit;
+    }
+    $idToDel = $data['id'] ?? ($_POST['id'] ?? '');
+    $docs = getFaDocsData($faDocsFile);
+    foreach ($docs as $d) {
+        if ($d['id'] == $idToDel) {
+            $path = $d['archivo'];
+            if ($path && file_exists($path)) {
+                @unlink($path);
+            }
+        }
+    }
+    $docs = array_values(array_filter($docs, function($d) use ($idToDel) {
+        return $d['id'] != $idToDel;
+    }));
+    saveFaDocsData($faDocsFile, $docs);
+    echo json_encode(['success'=>true, 'message'=>'El documento ha sido borrado del portal de los alumnos.']);
+    exit;
+}
+
+if ($action === 'save_fa_doc') {
+    if (!isset($_SESSION['admin_logged_in'])) {
+        echo json_encode(['success'=>false, 'message'=>'No autorizado.']); exit;
+    }
+    $titulo = $_POST['titulo'] ?? '';
+    $descripcion = $_POST['descripcion'] ?? '';
+    $id = $_POST['id'] ?? '';
+    
+    if (!$titulo) {
+        echo json_encode(['success'=>false, 'message'=>'El título es requerido.']); exit;
+    }
+    
+    $docs = getFaDocsData($faDocsFile);
+    $savedFile = null;
+    
+    if (isset($_FILES['archivo_pdf']) && $_FILES['archivo_pdf']['error'] === UPLOAD_ERR_OK) {
+        $ext = strtolower(pathinfo($_FILES['archivo_pdf']['name'], PATHINFO_EXTENSION));
+        // Permitimos PDFs, Docs y PPTs
+        if (!in_array($ext, ['pdf', 'docx', 'doc', 'zip', 'pptx', 'ppt', 'xlsx'])) {
+            echo json_encode(['success'=>false, 'message'=>'Solo se permiten archivos comunes de clase (pdf, doc, zip, ppt, etc).']); exit;
+        }
+        $dir = 'data/uploads/fa_docs/';
+        if (!is_dir($dir)) @mkdir($dir, 0777, true);
+        $safeName = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $_FILES['archivo_pdf']['name']);
+        $filePath = $dir . 'DOC_' . time() . '_' . $safeName;
+        if (move_uploaded_file($_FILES['archivo_pdf']['tmp_name'], $filePath)) {
+            $savedFile = $filePath;
+        }
+    }
+    
+    // Validar en FrontEnd si mandan archivo para nuevas inserciones, aqui es opcional solo en edicion
+    
+    if ($id) {
+        foreach ($docs as &$d) {
+            if ($d['id'] == $id) {
+                $d['titulo'] = $titulo;
+                $d['descripcion'] = $descripcion;
+                if ($savedFile) {
+                    $d['archivo'] = $savedFile;
+                }
+                break;
+            }
+        }
+        $msg = "Se actualizó la información del documento.";
+    } else {
+        $maxId = 0;
+        foreach ($docs as $d) {
+            if ((int)$d['id'] > $maxId) $maxId = (int)$d['id'];
+        }
+        if (!$savedFile) {
+            echo json_encode(['success'=>false, 'message'=>'Debes adjuntar un archivo físico para el nuevo documento.']); exit;
+        }
+        $docs[] = [
+            'id' => $maxId + 1,
+            'titulo' => $titulo,
+            'descripcion' => $descripcion,
+            'archivo' => $savedFile,
+            'fecha_creacion' => date('d/m/Y')
+        ];
+        $msg = "El documento se subió correctamente.";
+    }
+    
+    saveFaDocsData($faDocsFile, $docs);
+    echo json_encode(['success'=>true, 'message'=>$msg]);
+    exit;
+}
+
 // --- GESTIÓN DE TAREAS FÍSICA ATÓMICA ---
 $faTasksFile = 'data/fa_tareas_def.json';
 
@@ -402,6 +513,157 @@ if ($action === 'delete_fa_task') {
     }));
     saveFaTasksData($faTasksFile, $tasks);
     echo json_encode(['success'=>true, 'message'=>'La tarea ha sido retirada del portal de los alumnos.']);
+    exit;
+}
+
+if ($action === 'reset_fa_system') {
+    if (!isset($_SESSION['admin_logged_in'])) {
+        echo json_encode(['success'=>false, 'message'=>'No autorizado. Inicia sesión.']); exit;
+    }
+    
+    $tareasFile = 'fisicaatomica20261/fisicaatomica/data/tareas.csv';
+    $alumnosFile = 'fisicaatomica20261/fisicaatomica/data/alumnos.csv';
+    $faTasksFile = 'data/fa_tareas_def.json';
+    
+    // Función auxiliar para limpiar carpetas sin borrarlas
+    function clearDirectory($dir) {
+        if (!is_dir($dir)) return;
+        $files = array_diff(scandir($dir), array('.', '..'));
+        foreach ($files as $file) {
+            $path = $dir . DIRECTORY_SEPARATOR . $file;
+            if (is_dir($path)) {
+                clearDirectory($path);
+                @rmdir($path);
+            } else {
+                @unlink($path);
+            }
+        }
+    }
+
+    // 1. Limpiar Archivos de Tareas (Submissions)
+    if (file_exists($tareasFile)) {
+        file_put_contents($tareasFile, "codigo,tarea_num,fecha_entrega,archivo\n");
+    }
+    
+    // 2. Limpiar Lista de Alumnos
+    if (file_exists($alumnosFile)) {
+        file_put_contents($alumnosFile, "codigo,nombre,fecha_inscripcion\n");
+    }
+    
+    // 3. Limpiar Definición de Tareas (Assignments)
+    file_put_contents($faTasksFile, json_encode([], JSON_PRETTY_PRINT));
+    
+    // 4. Borrar archivos físicos (entregas de alumnos)
+    clearDirectory('fisicaatomica20261/fisicaatomica/uploads/');
+    
+    // 5. Borrar archivos físicos (enunciados del profesor)
+    clearDirectory('data/uploads/fa_admin/');
+    
+    // 6. Borrar definicion de documentos y archivos físicos
+    file_put_contents($faDocsFile, json_encode([], JSON_PRETTY_PRINT));
+    clearDirectory('data/uploads/fa_docs/');
+    
+    echo json_encode(['success' => true, 'message' => 'Sistema de Física Atómica reiniciado correctamente. Todos los datos han sido borrados.']);
+    exit;
+}
+
+if ($action === 'upload_fa_alumnos_csv') {
+    if (!isset($_SESSION['admin_logged_in'])) {
+        echo json_encode(['success'=>false, 'message'=>'No autorizado.']); exit;
+    }
+    
+    if (!isset($_FILES['archivo']) || $_FILES['archivo']['error'] !== UPLOAD_ERR_OK) {
+        echo json_encode(['success'=>false, 'message'=>'El archivo no se recibió correctamente en el servidor.']); exit;
+    }
+    $ext = strtolower(pathinfo($_FILES['archivo']['name'], PATHINFO_EXTENSION));
+    if ($ext === 'xls' || $ext === 'xlsx') {
+        echo json_encode(['success'=>false, 'message'=>'Formato incorrecto. El sistema detectó un archivo Excel, pero requiere un archivo de texto en formato CSV. Abre el archivo en Excel, selecciona "Guardar como" y elige "CSV (delimitado por comas)".']); exit;
+    }
+
+    $content = file_get_contents($_FILES['archivo']['tmp_name']);
+    
+    // Suprimir warnings temporalmente para que no rompan el JSON
+    $old_er = error_reporting(0);
+    
+    // Detectar y convertir codificación si es necesario (PUCP suele usar ISO-8859-1)
+    if (function_exists('mb_convert_encoding') && !mb_check_encoding($content, 'UTF-8')) {
+        $content = mb_convert_encoding($content, 'UTF-8', 'ISO-8859-1');
+    }
+    
+    // Usar un stream de memoria para procesar el CSV
+    $tempStream = fopen('php://temp', 'r+');
+    fwrite($tempStream, $content);
+    rewind($tempStream);
+
+    $alumnos = [];
+    $headerFound = false;
+    $colIndices = ['codigo' => -1, 'nombre' => -1, 'email' => -1];
+    
+    // Detectar delimitador
+    $firstLine = fgets($tempStream);
+    rewind($tempStream);
+    $delimiter = (strpos($firstLine, ";") !== false) ? ";" : ",";
+
+    while (($data = fgetcsv($tempStream, 2000, $delimiter)) !== FALSE) {
+        if (empty($data) || count($data) < 2) continue;
+        
+        if (!$headerFound) {
+            foreach ($data as $idx => $val) {
+                $val = trim($val);
+                if (strcasecmp($val, "Alumno") === 0 || strcasecmp($val, "Código") === 0) $colIndices['codigo'] = $idx;
+                if (strcasecmp($val, "Nombre") === 0) $colIndices['nombre'] = $idx;
+                if (stripos($val, "E-mail") !== false || stripos($val, "Correo") !== false) $colIndices['email'] = $idx;
+            }
+            if ($colIndices['codigo'] !== -1 && $colIndices['nombre'] !== -1) {
+                $headerFound = true;
+            }
+            continue;
+        }
+        
+        $codigo = trim($data[$colIndices['codigo']] ?? '');
+        $nombre = trim($data[$colIndices['nombre']] ?? '');
+        $email = ($colIndices['email'] !== -1) ? trim($data[$colIndices['email']] ?? '') : '';
+        
+        if ($email && strpos($email, ",") !== false) {
+            $email = trim(explode(",", $email)[0]);
+        }
+        
+        if (is_numeric($codigo) && $nombre !== "" && $nombre !== "Nombre") {
+            $alumnos[] = [
+                'codigo' => $codigo,
+                'nombre' => $nombre,
+                'email' => strtolower($email),
+                'fecha' => date('d-m-Y')
+            ];
+        }
+    }
+    fclose($tempStream);
+    
+    if (count($alumnos) > 0) {
+        $csvPath = 'fisicaatomica20261/fisicaatomica/data/alumnos.csv';
+        if (!is_dir(dirname($csvPath))) @mkdir(dirname($csvPath), 0777, true);
+        
+        $fp = @fopen($csvPath, 'w');
+        if (!$fp) {
+            echo json_encode(['success' => false, 'message' => 'No se puede escribir en alumnos.csv. Verifique permisos.']); exit;
+        }
+        fputcsv($fp, ['codigo', 'nombre', 'email', 'fecha_inscripcion']);
+        foreach ($alumnos as $al) {
+            fputcsv($fp, [$al['codigo'], $al['nombre'], $al['email'], $al['fecha']]);
+        }
+        fclose($fp);
+        
+        echo json_encode([
+            'success' => true, 
+            'message' => 'Padrón actualizado. Se importaron ' . count($alumnos) . ' alumnos.',
+            'count' => count($alumnos)
+        ]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'No se detectaron datos válidos. Verifique las columnas "Alumno" y "Nombre".']);
+    }
+    
+    // Restaurar nivel de errores
+    error_reporting($old_er);
     exit;
 }
 

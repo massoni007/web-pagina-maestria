@@ -22,7 +22,7 @@
             </ul>
         </div>
 
-        <div class="glass-panel" id="panel-email" style="flex: 1; max-width: 400px; display: flex; flex-direction: column; justify-content: center;">
+        <div class="glass-panel" id="panel-email" style="display: none; flex: 1; max-width: 400px; flex-direction: column; justify-content: center;">
             <div class="icon-header">⚛️</div>
             <h1>Física Atómica</h1>
             <p class="subtitle">Verificación de Identidad</p>
@@ -37,17 +37,20 @@
             <div id="error-email" class="error-msg"></div>
         </div>
 
-        <div class="glass-panel" id="panel-code" style="display:none;">
-            <div class="icon-header">📬</div>
-            <h1>Ingresa el Código</h1>
-            <p class="subtitle">Te enviamos 6 dígitos a tu bandeja</p>
+        <div class="glass-panel" id="panel-code" style="display:flex; flex-direction:column; justify-content:center; flex:1; max-width:400px;">
+            <div style="background: #fef08a; color: #854d0e; padding: 10px; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem; text-align: center; font-weight: bold;">
+                🛠️ MODO PRUEBA ACTIVO
+            </div>
+            <div class="icon-header">🚀</div>
+            <h1>Ingreso Directo</h1>
+            <p class="subtitle">Ingresa tu código de alumno para entrar</p>
             
             <form id="codeForm">
                 <div class="input-group">
-                    <label for="code">Código Seguro</label>
-                    <input type="text" id="code" required placeholder="123456" autocomplete="off" maxlength="6" style="text-align:center; font-size:1.5rem; letter-spacing:4px;">
+                    <label for="code">Código de Alumno PUCP</label>
+                    <input type="text" id="code" required placeholder="Ej: 19860313" autocomplete="off" style="text-align:center; font-size:1.5rem; letter-spacing:2px;">
                 </div>
-                <button type="submit" class="btn-primary" id="btn-code">Verificar y Entrar</button>
+                <button type="submit" class="btn-primary" id="btn-code">Entrar Rápidamente</button>
             </form>
             <div id="error-code" class="error-msg"></div>
         </div>
@@ -107,8 +110,8 @@
             err.style.display = 'none';
             
             const formData = new FormData();
-            formData.append('action', 'verify_code');
-            formData.append('code', code);
+            formData.append('action', 'direct_test_login');
+            formData.append('codigo', code);
 
             try {
                 const res = await fetch('api.php', { method: 'POST', body: formData });
