@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal - Mecánica Estadística</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-elements">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="modal hidden">
+        <div class="modal-content glass-panel text-center">
+            <h3>Acceso Administrativo</h3>
+            <p style="margin-bottom: 1rem;">Ingresa la clave maestra para continuar.</p>
+            <input type="password" id="admin-password" placeholder="***" style="width: 100%; text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem;">
+            <div class="actions" style="justify-content: center; margin-top: 1.5rem;">
+                <button id="admin-login-cancel" class="btn-secondary">Cancelar</button>
+                <button id="admin-login-submit" class="btn-primary">Ingresar</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="container">
+        <header class="glass-panel" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div class="header-text" style="text-align: left;">
+                <h1 style="font-size: 2rem; margin: 0;">Generador de Horarios</h1>
+                <p style="margin: 0;">Diseñado por Eduardo Massoni</p>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem; margin-left:auto;">
+                <button id="btn-admin-login" class="btn-secondary">⚙️ Administrador</button>
+                <button id="btn-logout" class="btn-secondary hidden" style="font-size:0.75rem; padding: 0.4rem 0.8rem;">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <section class="registration-section glass-panel" id="portal-section">
+            <div id="step-1-email" class="text-center">
+                <h2>Paso 1: Ingresa tu Correo</h2>
+                <p class="subtitle">Ingresa tu correo institucional para recibir un código de acceso.</p>
+                <div class="input-group" style="margin: 2rem 0;">
+                    <input type="email" id="identifier" placeholder="usuario@pucp.edu.pe" style="width: 100%; text-align: center; font-size: 1.2rem; padding: 1rem;">
+                </div>
+                <button id="btn-send-code" class="btn-primary" style="width: 100%; padding: 1.2rem;">Enviar Código de Acceso</button>
+            </div>
+
+            <div id="step-2-code" class="text-center hidden">
+                <h2>Paso 2: Verifica tu Código</h2>
+                <p class="subtitle">Hemos enviado un código a tu correo. Ingrésalo aquí para continuar.</p>
+                <div class="input-group" style="margin: 2rem 0;">
+                    <input type="text" id="verification-code" placeholder="000000" maxlength="6" style="width: 100%; text-align: center; font-size: 2rem; letter-spacing: 0.5rem; padding: 1rem;">
+                </div>
+                <button id="btn-verify-code" class="btn-primary" style="width: 100%; padding: 1.2rem; background: var(--success);">Verificar e Ingresar</button>
+                <p style="margin-top: 1.5rem;">
+                    <a href="#" id="btn-back-to-email" style="color: var(--accent); text-decoration: none; font-size: 0.9rem;">← Volver a ingresar correo</a>
+                </p>
+            </div>
+
+            <div id="form-msg" class="msg-box hidden" style="margin-top: 1.5rem;"></div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

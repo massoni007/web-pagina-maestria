@@ -110,6 +110,12 @@
                     <button class="btn btn-primary" style="padding: 0.6rem;" onclick="window.location.href='fisicaatomica20261/maestria/web/data/inscripciones.csv'">Descargar CSV de Alumnos</button>
                     <button class="btn btn-secondary" style="padding: 0.6rem; margin-top: 10px; background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; width: 100%;" onclick="openCursosEditor()">✎ Editar Catálogo de Cursos</button>
                 </div>
+                <!-- PANEL DE RESPALDO DE SISTEMA -->
+                <div class="dash-card" style="border: 2px dashed #3b82f6; background: #eff6ff;">
+                    <h3 style="color: #1d4ed8;">📦 Generar Respaldo Total</h3>
+                    <p>Descarga un archivo ZIP comprimido con todas las tareas de los alumnos, padrones CSV, lecturas y datos importantes del servidor.</p>
+                    <a href="descargar_respaldo.php" target="_blank" class="btn btn-primary" style="display: block; text-align: center; text-decoration: none; padding: 0.6rem; background: #2563eb; margin-top: 10px; font-weight: bold; font-family: 'Inter', sans-serif;">Descargar Respaldo (ZIP)</a>
+                </div>
             </div>
             
             <!-- Editor del Home CMS -->
@@ -344,10 +350,9 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    document.getElementById('status-msg').innerHTML = "<span style='color: #10b981;'>✅ ¡Código enviado con éxito a <strong>massoni007@gmail.com</strong>!<br><br><small style='color:#64748b;'><em>(Nota: Si no recibes el correo en unos minutos porque tu entorno de Windows no tiene servidor SMTP activo, el sistema ha guardado un archivo de respaldo llamado <strong>codigo_admin_recibido.txt</strong> en la carpeta principal para que puedas probar el acceso de todas formas).</em></small></span>";
+                    document.getElementById('status-msg').innerHTML = "<span style='color: #10b981;'>✅ ¡Código enviado con éxito a <strong>massoni007@gmail.com</strong>!<br><br><small style='color:#64748b;'><em>Por favor verifica tu bandeja de entrada o la carpeta de SPAM.</em></small></span>";
                     document.getElementById('code-input-area').style.display = 'block';
-                    btn.innerText = "Código Generado ✔️";
-                    if(result.debug_code) prompt('⚙️ MODO PRUEBA ALERTA DE COPIA\n\nTu código seguro es el siguiente (selecciona y copia):', result.debug_code);
+                    btn.innerText = "Código Enviado ✔️";
                 } else {
                     document.getElementById('status-msg').innerHTML = "<span style='color: #ef4444;'>❌ Error al generar código.</span>";
                     btn.disabled = false;

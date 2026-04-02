@@ -1,0 +1,109 @@
+[
+    {
+        "email": "admin@maestria.pucp",
+        "name": "David Bruelas",
+        "role": "profesor",
+        "created": "2026-03-31 10:00:00",
+        "updated": "2026-04-01 02:00:00",
+        "grid": [
+            [{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""}],
+            [{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""}],
+            [{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""}],
+            [{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""}],
+            [{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""}],
+            [{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""}],
+            [{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""}],
+            [{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""}],
+            [{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""}],
+            [{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""}],
+            [{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""}],
+            [{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""}],
+            [{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""}],
+            [{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""},{"state":"available","comment":""}]
+        ]
+    },
+    {
+        "email": "alumno1@pucp.edu.pe",
+        "name": "Alumno 1",
+        "role": "alumno",
+        "grid": [
+            [{"state":"available","comment":""},{"state":"neutral","comment":""},{"state":"available","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"available","comment":""},{"state":"neutral","comment":""},{"state":"available","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}]
+        ]
+    },
+    {
+        "email": "alumno2@pucp.edu.pe",
+        "name": "Alumno 2",
+        "role": "alumno",
+        "grid": [
+            [{"state":"available","comment":""},{"state":"neutral","comment":""},{"state":"available","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"available","comment":""},{"state":"neutral","comment":""},{"state":"available","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}]
+        ]
+    },
+    {
+        "email": "alumno3@pucp.edu.pe",
+        "name": "Alumno 3",
+        "role": "alumno",
+        "grid": [
+            [{"state":"available","comment":""},{"state":"neutral","comment":""},{"state":"available","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"available","comment":""},{"state":"neutral","comment":""},{"state":"available","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}]
+        ]
+    },
+    {
+        "email": "juan.rios@pucp.edu.pe",
+        "name": "Juan Ríos",
+        "role": "alumno",
+        "grid": [
+            [{"state":"available","comment":""},{"state":"neutral","comment":""},{"state":"available","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"unavailable","comment":"Clase de Electrodinámica"},{"state":"neutral","comment":""},{"state":"available","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}],
+            [{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""},{"state":"neutral","comment":""}]
+        ]
+    }
+]

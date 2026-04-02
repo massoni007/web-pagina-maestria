@@ -43,7 +43,7 @@ if ($action === 'send_code') {
         $mail->Body    = "<div style='font-family: Arial; padding: 20px; text-align: center;'><h2 style='color:#06b6d4'>Física Atómica 2026-1</h2><p>Tu código personal de acceso seguro es:</p><h1 style='background:#f1f5f9; padding:15px; border-radius:8px; letter-spacing:5px;'>{$code}</h1><p>Nunca compartas este código.</p></div>";
         
         $mail->send();
-        echo json_encode(["success" => true, "debug_code" => $code]);
+        echo json_encode(["success" => true]);
     } catch (Exception $e) {
         echo json_encode(["success" => false, "error" => "Ocurrió un error con el correo: " . $mail->ErrorInfo]);
     }

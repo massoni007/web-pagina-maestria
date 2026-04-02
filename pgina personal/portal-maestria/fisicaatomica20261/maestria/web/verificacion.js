@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 emailForm.style.display = 'none';
                 codeForm.style.display = 'block';
                 codeInput.focus();
-                if (result.debug_code) prompt('⚙️ MODO PRUEBA ALERTA DE COPIA\n\nTu código seguro es el siguiente (selecciona y copia):', result.debug_code);
             } else {
                 showMessage(result.message || 'Ocurrió un error al enviar el código. Intenta nuevamente.', 'error');
             }

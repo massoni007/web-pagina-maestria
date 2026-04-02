@@ -1,6 +1,14 @@
 <?php
 session_start();
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\SMTP;
+
+require 'fisicaatomica20261/fisicaatomica/PHPMailer/Exception.php';
+require 'fisicaatomica20261/fisicaatomica/PHPMailer/PHPMailer.php';
+require 'fisicaatomica20261/fisicaatomica/PHPMailer/SMTP.php';
+
 // Cabeceras para que responda en JSON
 header('Content-Type: application/json');
 
@@ -27,26 +35,29 @@ if ($action === 'send_code') {
     // Guardar el código en la sesión del servidor
     $_SESSION['admin_code'] = $codigo;
     
-    // IMPORTANTE: Como estás probando en una computadora local (Windows) que puede no tener servidor SMTP,
-    // escribiremos el código en un archivo txt como "plan B" para que puedas comprobar que funcionó
-    // sin tener que depender de si el correo sale o no de tu sistema local.
-    // Una vez subido a InfinityFree, el correo sí saldrá sin problemas.
-    $mensajeLog = "=== SOLICITUD DE ACCESO ADMIN ===\n" . 
-                  "Fecha: " . date("Y-m-d H:i:s") . "\n" .
-                  "Correo: $email\n" .
-                  "CODIGO GENERADO: $codigo\n" .
-                  "================================\n";
-    file_put_contents('codigo_admin_recibido.txt', $mensajeLog);
-    
-    // Intentar enviar el mail real
-    $subject = "Código de Acceso Administrativo - Maestría PUCP";
-    $message = "Hola Eduardo Massoni,\n\nTu código de acceso de 6 dígitos para entrar al Panel de Gestión es: $codigo\n\nEste código caduca pronto. Si no fuiste tú quien solicitó el acceso, puedes ignorar este correo de manera segura.\n\n--\nPortal de Coordinación PUCP";
-    $headers = "From: noreply@maestriafisica.pucp\r\n";
-    
-    // Silenciamos posibles errores de mail() en local usando '@'
-    @mail($email, $subject, $message, $headers);
-    
-    echo json_encode(['success' => true, 'message' => 'Código generado.', 'debug_code' => $codigo]);
+    // Intentar enviar el mail real con PHPMailer
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'massoni007@gmail.com';
+        $mail->Password   = 'kfoq xyhk rbkg bkqd';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        $mail->Port       = 465;
+        $mail->SMTPOptions = array('ssl' => array('verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true));
+        
+        $mail->setFrom('massoni007@gmail.com', 'Coordinacion Maestria');
+        $mail->addAddress($email);
+        $mail->isHTML(true);
+        $mail->Subject = 'Codigo de Acceso Administrativo - Maestria PUCP';
+        $mail->Body    = "<div style='font-family: Arial; padding: 20px; text-align: center;'><h2 style='color:#0f172a'>Panel de Gestión Administrativa</h2><p>Tu código personal de acceso seguro es:</p><h1 style='background:#f1f5f9; padding:15px; border-radius:8px; letter-spacing:5px;'>{$codigo}</h1><p>Nunca compartas este código con los estudiantes.</p></div>";
+        
+        $mail->send();
+        echo json_encode(['success' => true, 'message' => 'Código enviado a tu correo.']);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'error' => "Hubo un error al enviar el correo: " . $mail->ErrorInfo]);
+    }
     exit;
 }
 

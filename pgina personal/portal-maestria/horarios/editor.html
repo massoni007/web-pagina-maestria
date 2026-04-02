@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horarios - Mecánica Estadística</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-elements">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="modal hidden">
+        <div class="modal-content glass-panel text-center">
+            <h3>Acceso Restringido</h3>
+            <p style="margin-bottom: 1rem;">Solo el administrador puede visualizar horarios.</p>
+            <input type="password" id="admin-password" placeholder="***" style="width: 100%; text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem;">
+            <div class="actions" style="justify-content: center; margin-top: 1.5rem;">
+                <button id="admin-login-cancel" class="btn-secondary">Volver</button>
+                <button id="admin-login-submit" class="btn-primary">Ingresar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for comments -->
+    <div id="comment-modal" class="modal hidden">
+        <div class="modal-content glass-panel">
+            <h3>Motivo de Inasistencia</h3>
+            <p id="modal-slot-info">Día - Hora</p>
+            
+            <div class="input-group" style="margin-top: 1rem;">
+                <label for="modal-reason-select">Razón principal</label>
+                <select id="modal-reason-select">
+                    <option value="" disabled selected>Selecciona una opción...</option>
+                    <option value="Trabajo dentro de la PUCP">Trabajo dentro de la PUCP</option>
+                    <option value="Trabajo fuera de la PUCP">Trabajo fuera de la PUCP</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="input-group" style="margin-top: 1rem;">
+                <label for="modal-comment">Detalles (Opcional)</label>
+                <textarea id="modal-comment" placeholder="Ej. Choque con el curso de Electrodinámica..." rows="3"></textarea>
+            </div>
+
+            <div class="actions" style="justify-content: flex-end; margin-top: 1.5rem;">
+                <button id="modal-cancel-btn" class="btn-secondary">Cancelar</button>
+                <button id="modal-save-btn" class="btn-primary" style="background: var(--danger)">Marcar Ocupado</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Disclaimer Modal -->
+    <div id="disclaimer-modal" class="modal hidden">
+        <div class="modal-content glass-panel text-center">
+            <h3>Declaración Jurada</h3>
+            <p style="margin-top: 1rem; line-height: 1.6;">
+                Usted acepta que los datos que va a otorgar sobre su disponibilidad son <strong>veraces</strong> y acepta que va a asistir a las clases de acuerdo a lo que está poniendo en las horas libres.
+            </p>
+            <div class="actions" style="justify-content: center; margin-top: 2rem;">
+                <button id="disclaimer-cancel" class="btn-secondary">Cancelar</button>
+                <button id="disclaimer-accept" class="btn-primary" style="background: var(--success)">Sí, Juro y Guardo</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="container">
+        <header class="glass-panel" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div class="header-text" style="text-align: left;">
+                <h1 style="font-size: 1.8rem; margin: 0;">Editor de Disponibilidad</h1>
+                <div style="display:flex; align-items:center; gap:1rem; margin-top:0.25rem;">
+                    <p style="margin: 0; font-size:0.9rem;">ID: <strong id="logged-email" style="color:var(--accent)">...</strong></p>
+                    <button id="btn-logout" class="btn-secondary" style="font-size:0.8rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);">
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+            <button id="btn-admin-login" class="btn-secondary" style="margin-left:auto;">⚙️ Administrador</button>
+        </header>
+
+        <section class="registration-section glass-panel">
+            <h2>Paso 1: Confirma tu Nombre</h2>
+            <div class="input-grid" style="display:grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 2rem;">
+                <div class="input-group">
+                    <label for="name">Nombre / Apellido</label>
+                    <input type="text" id="name" placeholder="Ej. Juan Pérez">
+                </div>
+            </div>
+
+            <h2>Paso 2: Rellena tu Horario</h2>
+            <p class="subtitle">
+                Usa el <strong>Pincel Rojo</strong> para marcar tus horas ocupadas y el <strong>Verde</strong> para tus horas libres. <br>
+                Usa el <strong>Botón Mágico</strong> para autocompletar rápidamente.
+            </p>
+
+            <div class="paint-controls">
+                <button id="tool-unavailable" class="tool-btn active-tool-red">
+                    <span class="color-dot dot-red"></span> No Disponible
+                </button>
+                <button id="tool-available" class="tool-btn">
+                    <span class="color-dot dot-green"></span> Disponible
+                </button>
+                <button id="tool-magic" class="tool-btn" style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); margin-left:auto; color: #6ee7b7;">
+                    ✨ Botón Mágico
+                </button>
+                <button id="tool-clear" class="tool-btn">Borrar</button>
+            </div>
+
+            <div class="schedule-grid-container table-responsive">
+                <table class="schedule-table" id="schedule-table">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="actions" style="margin-top: 2rem;">
+                <button id="btn-save-final" class="btn-primary" style="width: 100%; padding: 1.5rem; font-size: 1.2rem; background: linear-gradient(135deg, #10b981, #059669);">
+                    Guardar Cambios y Salir
+                </button>
+            </div>
+            <div id="form-msg" class="msg-box hidden"></div>
+        </section>
+
+        <!-- Admin Dashboard (Internal use if authenticated) -->
+        <section id="admin-dashboard-section" class="dashboard-section glass-panel hidden" style="margin-top: 3rem;">
+             <div class="header-split">
+                 <div>
+                     <h2 style="border:none; padding:0; margin:0;">Panel Administrativo de Cálculo</h2>
+                     <p class="subtitle" style="margin:0.25rem 0 0;">Selecciona la estructura de las 4 horas semanales.</p>
+                 </div>
+                 <div style="display:flex; gap: 0.75rem; align-items:center; flex-wrap:wrap;">
+                     <button id="btn-stats" class="btn-secondary" onclick="window.open('stats.html','_blank','width=900,height=750')">
+                         📊 Ver Estadísticas
+                     </button>
+                     <button id="btn-clear-data" class="btn-danger" style="border:1px solid rgba(239,68,68,0.3);">
+                         🗑️ Borrar Todo
+                     </button>
+                     <button id="btn-admin-logout" class="btn-secondary" style="border:1px solid var(--accent); color: var(--accent);">
+                         🚪 Cerrar Sesión Admin
+                     </button>
+                 </div>
+             </div>
+             
+             <div class="search-options" style="margin-top: 1.5rem; margin-bottom: 2rem; background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 12px;">
+                <h3>Estructura deseada</h3>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.05); padding: 0.75rem 1rem; border-radius: 8px;">
+                        <input type="radio" name="combo-type" value="2_2" checked>
+                        <span>2H + 2H</span>
+                    </label>
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.05); padding: 0.75rem 1rem; border-radius: 8px;">
+                        <input type="radio" name="combo-type" value="2_1_1">
+                        <span>2H + 1H + 1H</span>
+                    </label>
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.05); padding: 0.75rem 1rem; border-radius: 8px;">
+                        <input type="radio" name="combo-type" value="3_1">
+                        <span>3H + 1H</span>
+                    </label>
+                </div>
+                <button id="btn-calculate" class="btn-primary" style="background:var(--accent-gradient); margin-top: 1.5rem; width: 100%; font-size: 1rem;">Buscar Mejores Combinaciones</button>
+            </div>
+
+            <div id="results-container" class="hidden">
+                 <!-- Results injected by JS -->
+            </div>
+        </section>
+    </main>
+
+    <script src="editor_logic.js"></script>
+</body>
+</html>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas de Disponibilidad | Mecánica Estadística</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: rgba(30, 41, 59, 0.7);
+            --border: rgba(255,255,255,0.08);
+            --accent: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warn: #f59e0b;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle { color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem; }
+        button {
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.08);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.13); }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .sum-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            text-align: center;
+        }
+        .sum-card .val {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1;
+        }
+        .sum-card .lbl { font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem; }
+
+        /* Ranking */
+        .section-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .student-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+            transition: border-color 0.2s;
+        }
+        .student-card:hover { border-color: rgba(59,130,246,0.3); }
+        .rank-badge {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; font-weight: 700;
+            flex-shrink: 0;
+        }
+        .rank-1 { background: rgba(245,158,11,0.2); color: #f59e0b; border: 2px solid #f59e0b; }
+        .rank-2 { background: rgba(148,163,184,0.15); color: #94a3b8; border: 2px solid #94a3b8; }
+        .rank-3 { background: rgba(180,120,60,0.15); color: #cd7f32; border: 2px solid #cd7f32; }
+        .rank-other { background: rgba(59,130,246,0.1); color: var(--accent); border: 2px solid rgba(59,130,246,0.3); }
+
+        .student-info { flex: 1; min-width: 160px; }
+        .student-name { font-weight: 600; font-size: 1rem; }
+        .student-email { font-size: 0.75rem; color: var(--muted); margin-top: 0.1rem; }
+        .student-role {
+            font-size: 0.7rem; font-weight: 600;
+            padding: 0.15rem 0.5rem; border-radius: 10px;
+            display: inline-block; margin-top: 0.25rem;
+        }
+        .role-alumno { background: rgba(59,130,246,0.15); color: #93c5fd; }
+        .role-profesor { background: rgba(139,92,246,0.15); color: #c4b5fd; }
+
+        .stats-bars { flex: 2; min-width: 200px; }
+        .bar-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem; font-size: 0.8rem; }
+        .bar-label { width: 72px; color: var(--muted); flex-shrink: 0; }
+        .bar-track { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+        .bar-avail { background: var(--success); }
+        .bar-unavail { background: var(--danger); }
+        .bar-neutral { background: rgba(255,255,255,0.15); }
+        .bar-count { width: 36px; text-align: right; font-weight: 600; flex-shrink: 0; }
+        .avail-count { color: var(--success); }
+        .unavail-count { color: var(--danger); }
+        .neutral-count { color: var(--muted); }
+
+        .pct-pill {
+            font-size: 0.75rem; font-weight: 700;
+            padding: 0.25rem 0.6rem; border-radius: 20px;
+            flex-shrink: 0;
+        }
+        .pct-high { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+        .pct-mid  { background: rgba(245,158,11,0.15); color: #fcd34d; }
+        .pct-low  { background: rgba(239,68,68,0.15);  color: #fca5a5; }
+
+        .visor-btn {
+            background: rgba(59,130,246,0.1);
+            color: #93c5fd;
+            border: 1px solid rgba(59,130,246,0.25);
+            padding: 0.4rem 0.9rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        .visor-btn:hover { background: rgba(59,130,246,0.25); }
+
+        /* Loading */
+        .loading { text-align: center; color: var(--muted); padding: 3rem; font-size: 1rem; }
+        .glow-orb { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.25; pointer-events: none; z-index: -1; }
+        .orb-1 { width: 350px; height: 350px; background: #3b82f6; top: -100px; left: -100px; }
+        .orb-2 { width: 400px; height: 400px; background: #8b5cf6; bottom: -150px; right: -100px; }
+    </style>
+</head>
+<body>
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+
+    <div class="page-header">
+        <div>
+            <h1>📊 Estadísticas de Disponibilidad</h1>
+            <p class="subtitle">Mecánica Estadística · Clasificación por horas disponibles</p>
+        </div>
+        <button class="btn-secondary" onclick="window.close()">✕ Cerrar</button>
+    </div>
+
+    <div id="summary-cards" class="summary-cards"></div>
+
+    <div class="section-title">🏆 Ranking de Disponibilidad</div>
+    <div id="ranking-list"><div class="loading">Cargando datos...</div></div>
+
+    <script>
+        const TOTAL_CELLS = 14 * 5; // 14 filas × 5 días
+
+        async function loadStats() {
+            try {
+                const res = await fetch('api.php', {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'get_all_schedules' })
+                });
+                const result = await res.json();
+                if (!result.success) {
+                    document.getElementById('ranking-list').innerHTML =
+                        '<div class="loading">No autorizado o sin datos.</div>';
+                    return;
+                }
+
+                const data = result.data || [];
+                renderSummary(data);
+                renderRanking(data);
+            } catch(e) {
+                document.getElementById('ranking-list').innerHTML =
+                    '<div class="loading">Error de conexión con el servidor.</div>';
+            }
+        }
+
+        function countCells(grid) {
+            let avail = 0, unavail = 0, neutral = 0;
+            grid.forEach(row => row.forEach(cell => {
+                if (cell.state === 'available') avail++;
+                else if (cell.state === 'unavailable') unavail++;
+                else neutral++;
+            }));
+            return { avail, unavail, neutral, total: avail + unavail + neutral };
+        }
+
+        function renderSummary(data) {
+            const students = data.filter(p => p.role === 'alumno');
+            const totalParticipants = data.length;
+            const avgAvail = students.length
+                ? Math.round(students.reduce((sum, p) => sum + countCells(p.grid).avail, 0) / students.length)
+                : 0;
+            const fullyAvail = students.filter(p => {
+                const c = countCells(p.grid);
+                return c.unavail === 0;
+            }).length;
+
+            const el = document.getElementById('summary-cards');
+            el.innerHTML = `
+                <div class="sum-card">
+                    <div class="val">${totalParticipants}</div>
+                    <div class="lbl">Participantes totales</div>
+                </div>
+                <div class="sum-card">
+                    <div class="val">${students.length}</div>
+                    <div class="lbl">Alumnos</div>
+                </div>
+                <div class="sum-card">
+                    <div class="val" style="color:var(--success)">${avgAvail}</div>
+                    <div class="lbl">Promedio horas disponibles</div>
+                </div>
+                <div class="sum-card">
+                    <div class="val" style="color:var(--warn)">${fullyAvail}</div>
+                    <div class="lbl">Sin ningún choque</div>
+                </div>
+                <div class="sum-card">
+                    <div class="val">${TOTAL_CELLS}</div>
+                    <div class="lbl">Total celdas por persona</div>
+                </div>
+            `;
+        }
+
+        function renderRanking(data) {
+            // Sort by available descending, then by unavailable ascending
+            const ranked = [...data].sort((a, b) => {
+                const ca = countCells(a.grid);
+                const cb = countCells(b.grid);
+                if (cb.avail !== ca.avail) return cb.avail - ca.avail;
+                return ca.unavail - cb.unavail;
+            });
+
+            const container = document.getElementById('ranking-list');
+            container.innerHTML = '';
+
+            ranked.forEach((person, idx) => {
+                const c = countCells(person.grid);
+                const pct = Math.round((c.avail / (c.total || 1)) * 100);
+                const pctClass = pct >= 70 ? 'pct-high' : pct >= 40 ? 'pct-mid' : 'pct-low';
+                const rankClass = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'rank-other';
+                const rankSymbol = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx+1}`;
+                const roleClass = person.role === 'profesor' ? 'role-profesor' : 'role-alumno';
+                const roleLabel = person.role === 'profesor' ? '👨‍🏫 Profesor' : '🎓 Alumno';
+
+                const card = document.createElement('div');
+                card.className = 'student-card';
+                card.innerHTML = `
+                    <div class="rank-badge ${rankClass}">${rankSymbol}</div>
+
+                    <div class="student-info">
+                        <div class="student-name">${person.name}</div>
+                        <div class="student-email">${person.email || ''}</div>
+                        <span class="student-role ${roleClass}">${roleLabel}</span>
+                    </div>
+
+                    <div class="stats-bars">
+                        <div class="bar-row">
+                            <span class="bar-label">Disponible</span>
+                            <div class="bar-track">
+                                <div class="bar-fill bar-avail" style="width:${(c.avail/c.total*100).toFixed(1)}%"></div>
+                            </div>
+                            <span class="bar-count avail-count">${c.avail}h</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Bloqueado</span>
+                            <div class="bar-track">
+                                <div class="bar-fill bar-unavail" style="width:${(c.unavail/c.total*100).toFixed(1)}%"></div>
+                            </div>
+                            <span class="bar-count unavail-count">${c.unavail}h</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Sin marcar</span>
+                            <div class="bar-track">
+                                <div class="bar-fill bar-neutral" style="width:${(c.neutral/c.total*100).toFixed(1)}%"></div>
+                            </div>
+                            <span class="bar-count neutral-count">${c.neutral}h</span>
+                        </div>
+                    </div>
+
+                    <span class="pct-pill ${pctClass}">${pct}% libre</span>
+
+                    <button class="visor-btn" onclick="window.open('visor.html?name=${encodeURIComponent(person.name)}','_blank','width=900,height=720')">
+                        Ver horario
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        loadStats();
+    </script>
+</body>
+</html>

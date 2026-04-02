@@ -102,7 +102,7 @@ try {
     // Enviar el correo
     $mail->send();
     
-    echo json_encode(['success' => true, 'message' => '¡Código enviado correctamente a tu correo!', 'debug_code' => $code]);
+    echo json_encode(['success' => true, 'message' => '¡Código enviado correctamente a tu correo!']);
 
 } catch (Exception $e) {
     // Si PHPMailer falla (por ejemplo contraseña incorrecta), lo capturamos aquí
